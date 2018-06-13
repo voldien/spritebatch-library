@@ -41,12 +41,12 @@ extern const char* gc_sb_label_geometry_shader;
  *
  */
 typedef struct sb_sprite_t {
-	float pos[3];       /*	position.	*/
-	float angle;        /*	angle.	*/
-	float rect[4];      /*	*/
-	int texture;        /*	texture index.*/
-	float scale;        /*	uniform scale.	*/
-	float color[4];     /*	color.	*/
+	float pos[3];       /*	World position.	*/
+	float angle;        /*	Angle in radian.	*/
+	float rect[4];      /*	View rectangle. */
+	int texture;        /*	Texture index.*/
+	float scale;        /*	Uniform aligned scale.	*/
+	float color[4];     /*	Diffuse Color.	*/
 } SBSprite;
 
 /**
@@ -65,39 +65,48 @@ typedef struct sb_sprite_batch_t {
 	/*
 	 *	number of sprite allocated.
 	 */
-	unsigned int num;           /*	*/
-	unsigned int numDraw;       /*	*/
-	unsigned int numlabelDraw;  /*	*/
-	unsigned int vbo;           /*	*/
-	unsigned int vao;           /*	*/
+	unsigned int num;           /*	Number of allocated sprites.    */
+	unsigned int numDraw;       /*	Number of sprite in batch.  */
+	unsigned int numlabelDraw;  /*	Number of label sprite in batch.    */
+	unsigned int vbo;           /*	Sprite buffer uid.  */
+	unsigned int vao;           /*	Vertex geometry object uid. */
+	void* pspritemap;           /*  TODO add support for DMA sprites.   */
+	void* plabelmap;            /*  TODO add support for DMA labels.    */
 
 	/*	*/
-	SBShader spriteShader;      /*	*/
-	SBShader fontShader;        /*  */
+	SBShader spriteShader;      /*	Sprite shader.  */
+	SBShader fontShader;        /*  Font shader.    */
 
 	/*	*/
 	int numTexture;             /*	Number of associated textures.	*/
 	int numMaxTextures;         /*	Max number of texture units.	*/
 
 	/*	*/
-	int* texture;               /*  */
-	SBSprite* sprite;           /*  */
+	int* texture;               /*  Texture index table.    */
+	SBSprite* sprite;           /*  Sprite buffer.  */
+	SBSprite* label;            /*  Label buffer.  */
 
-	float scale;                /*  */
-	float cameraPos[2];         /*  */
-	float rotation;             /*  */
+	float scale;                /*  Global aligned world scale. */
+	float cameraPos[2];         /*  Camera position in world space. */
+	float rotation;             /*  Global rotation.    */
 
 	/*	*/
-	unsigned int width;         /*  */
-	unsigned int height;        /*  */
+	unsigned int width;         /*  Viewport width from sbBeginSpriteBatch. */
+	unsigned int height;        /*  Viewport height from sbBeginSpriteBatch. */
 
 	/*	view matrix.	*/
-	float viewmatrix[3][3];     /*  */
+	float viewmatrix[3][3];     /*  Cached view matrix for sprite transformations.   */
 
 	/*	cached uniform location.	*/
-	SBSpriteUniformIndex uniform;
+	SBSpriteUniformIndex uniform;   /*  */
 
 } SBSpriteBatch;
+
+/**
+ * Get version of the library.
+ * @return non-null terminated character pointer.
+ */
+extern SBDECLSPEC const char* SBAPISTDENTRY sbGetVersion(void);
 
 /**
  * Initialize spritebatch structure and associated
@@ -133,10 +142,11 @@ extern SBDECLSPEC void SBAPIENTRY sbSpriteBatchAllocateSprite(
  * @param spriteBatch
  * @param camerapos
  * @param scale
+ * @param rotation
  */
 extern SBDECLSPEC void SBAPIENTRY sbBeginSpriteBatch(
         SBSpriteBatch* SB_RESTRICT spriteBatch,
-        const float* SB_RESTRICT camerapos, float scale);
+        const float* SB_RESTRICT camerapos, float scale, float rotation);
 
 /**
  * End and flush the spritebatch.
