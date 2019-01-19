@@ -1,0 +1,4 @@
+# Root cmake directory for the tests.
+ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/common-test)
+ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/unit-test)
+ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/graphic-test)
