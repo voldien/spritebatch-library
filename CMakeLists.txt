@@ -55,7 +55,12 @@ TARGET_LINK_LIBRARIES(spb ${OPENGL_LIBRARIES} ${FREETYPE_LIBRARIES})
 
 # Install the target.
 INSTALL(TARGETS spb DESTINATION lib)
-INSTALL (FILES ${headers} DESTINATION include/spb)
+FILE(GLOB install_headers ${CMAKE_CURRENT_SOURCE_DIR}/include/def.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/font.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/shader.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/sprite.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/texture.h)
+INSTALL (FILES ${install_headers} DESTINATION include/spb)
 
 # Testing directory
 ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/test)
