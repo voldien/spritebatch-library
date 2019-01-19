@@ -27,21 +27,57 @@ extern "C"{
 #endif
 
 /**
- *
+ * Font structure.
  */
 typedef struct sb_font_t{
-	struct sb_texture texture;  /*  */
-	unsigned short* texUV;
-	float size;
+	SBTexture texture;          /*  Font texture.   */
+	unsigned int numChar;       /*  Number of character.   */
+	float* advance;             /*  */
+	float* width;               /*  Width of each character in pixels.  */
+	float* height;              /*  Height of each character in pixels.*/
+	/*  UV rectangle.   */
+	float* tex_x1;              /*  */
+	float* tex_x2;              /*  */
+	float* tex_y1;              /*  */
+	float* tex_y2;              /*  */
+	/*  UV offset.  */
+	float* offset_x;            /*  */
+	float* offset_y;            /*  */
+	/*  Size of the font.   */
+	float size;                 /*  */
 }SBFont;
 
 /**
- * Create font.
- * @param cpath
- * @param font
+ * Create font structure.
+ * @param cpath valid file path.
+ * @param font non-null valid pointer.s
  * @return non-zero if successfully.
  */
 extern SBDECLSPEC int SBAPIENTRY sbCreateFont(const char* SB_RESTRICT cpath, SBFont* SB_RESTRICT font, const size_t size);
+
+/**
+ * Release font resources.
+ * @param font valid font object.
+ * @return non-negative if successfully.
+ */
+extern SBDECLSPEC int SBAPIENTRY sbDeleteFont(SBFont* font);
+
+/**
+ * Converts the the high resolution font bitmap to
+ * signed distance field.
+ * @param font Valid font object.
+ * @param src font bitmap atlas.
+ * @param dst signed distance field atlas.
+ * @param srcWidth bitmap width in pixels.
+ * @param srcHeight bitmap height in pixels.
+ * @param dstWidth signed distance field width in pixels.
+ * @param dstHeight signed distance field height in pixels.
+ * @param downscale
+ * @return non-negative if successfully.
+ */
+extern SBDECLSPEC int SBAPIENTRY sbCreateSignDistanceField(SBFont* SB_RESTRICT font, const void* SB_RESTRICT src, void** SB_RESTRICT dst,
+                                                           int srcWidth, int srcHeight, int* SB_RESTRICT dstWidth,
+                                                           int* SB_RESTRICT dstHeight, int downscale);
 
 #ifdef __cplusplus	/* C++ environment	*/
 }
