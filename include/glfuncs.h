@@ -19,8 +19,15 @@
 #ifndef _GLFUNCS_H_
 #define _GLFUNCS_H_ 1
 #include"def.h"
+#ifdef GL_ES_VERSION_3_0
+#include<GLES3/gl3.h>
+#elif defined(GL_ES_VERSION_2_0)
+#undef GL_ES_VERSION_2_0
+	#include<GLES2/gl2.h>
+#else
 #include<GL/gl.h>
 #include<GL/glext.h>
+#endif
 
 #ifdef __cplusplus	/* C++ environment	*/
 extern "C"{
@@ -31,9 +38,9 @@ extern "C"{
  */
 extern SBDECLSPEC int sb_internal_load_gl_func(void);
 
-/*  */
-extern SBDECLSPEC PFNGLPOINTPARAMETERIPROC glPointParameteri;
-extern SBDECLSPEC PFNGLPOINTPARAMETERFPROC glPointParameterf;
+/*  Point primitive.    */
+extern SBDECLSPEC PFNGLPOINTPARAMETERIPROC spbGLPointParameteri;
+extern SBDECLSPEC PFNGLPOINTPARAMETERFPROC spbGLPointParameterf;
 
 /*  Shader. */
 extern SBDECLSPEC PFNGLISPROGRAMARBPROC spbGLIsProgramARB;
@@ -56,7 +63,7 @@ extern SBDECLSPEC PFNGLGETSHADERIVPROC spbGLGetShaderiv;
 extern SBDECLSPEC PFNGLGETSHADERINFOLOGPROC spbGLGetShaderInfoLog;
 extern SBDECLSPEC PFNGLVALIDATEPROGRAMPROC spbGLValidateProgram;
 
-/**/
+/*  */
 extern SBDECLSPEC PFNGLUNIFORM1IVARBPROC spbGLUniform1ivARB;
 extern SBDECLSPEC PFNGLUNIFORM1FVARBPROC spbGLUniform1fvARB;
 extern SBDECLSPEC PFNGLUNIFORMMATRIX3FVARBPROC spbGLUniformMatrix3fvARB;

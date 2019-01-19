@@ -198,8 +198,10 @@
 #if defined(__pnacl__)          /* portable nacl google */
 	#define SB_PNACL 1
 #endif
+
+/*  Unix platform.  */
 #if defined(__unix__) || defined(__unix) || defined(unix)	/*  Unix    */
-	#   define SB_UNIX 1
+	#define SB_UNIX 1
 #endif
 
 /**
@@ -269,7 +271,7 @@
 
 
 /**
- *	library declaration.
+ *	Library declaration.
  */
 #if defined(SB_GNUC) || defined(SB_CLANG)
 	#if defined(SB_UNIX)

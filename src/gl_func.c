@@ -18,8 +18,9 @@
 
 #endif
 
-PFNGLPOINTPARAMETERIPROC glPointParameteri;
-PFNGLPOINTPARAMETERFPROC glPointParameterf;
+/*  */
+PFNGLPOINTPARAMETERIPROC spbGLPointParameteri;
+PFNGLPOINTPARAMETERFPROC spbGLPointParameterf;
 
 /*  Shader. */
 PFNGLCOMPILESHADERARBPROC spbGLCompileShaderARB;
@@ -77,15 +78,19 @@ static SB_ALWAYS_INLINE void* load_gl_func(const char* symbol){
  */
 int sb_internal_load_gl_func(void){
 
+	/*  If any function is not null implies function has already been invoked.  */
+	if(spbGLPointParameteri != NULL)
+		return 2;
+
 	/*  */
-	glPointParameteri = (PFNGLPOINTPARAMETERIPROC)load_gl_func("glPointParameteri");
-	glPointParameterf = (PFNGLPOINTPARAMETERFPROC)load_gl_func("glPointParameterf");
+	spbGLPointParameteri = (PFNGLPOINTPARAMETERIPROC)load_gl_func("glPointParameteri");
+	spbGLPointParameterf = (PFNGLPOINTPARAMETERFPROC)load_gl_func("glPointParameterf");
 
 	/*  Load shader functions.  */
 	spbGLCompileShaderARB = (PFNGLCOMPILESHADERARBPROC)load_gl_func("glCompileShaderARB");
 	spbGLCreateShader = (PFNGLCREATESHADERPROC)load_gl_func("glCreateShader");
 	spbGLShaderSourceARB = (PFNGLSHADERSOURCEARBPROC)load_gl_func("glShaderSourceARB");
-	spbGLGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)load_gl_func("glShaderSourceARB");
+	spbGLGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)load_gl_func("glGetUniformLocation");
 	spbGLDeleteProgram = (PFNGLDELETEPROGRAMPROC)load_gl_func("glDeleteProgram");
 	spbGLIsShader = (PFNGLISSHADERPROC)load_gl_func("glIsShader");
 	spbGLDetachShader = (PFNGLDETACHSHADERPROC)load_gl_func("glDetachShader");

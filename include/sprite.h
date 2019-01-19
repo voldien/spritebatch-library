@@ -20,21 +20,11 @@
 #define _SB_SPRITE_H_ 1
 #include"texture.h"
 #include"shader.h"
-#include "font.h"
+#include"font.h"
 
 #ifdef __cplusplus	/*	C++ environment	*/
 extern "C" {
 #endif
-
-/**
- *	Read only global.
- */
-extern const char* gc_sb_sprite_vertex_shader;
-extern const char* gc_sb_sprite_fragment_shader;
-extern const char* gc_sb_sprite_geometry_shader;
-extern const char* gc_sb_label_vertex_shader;
-extern const char* gc_sb_label_fragment_shader;
-extern const char* gc_sb_label_geometry_shader;
 
 /**
  *	Sprite attributes.
@@ -62,9 +52,8 @@ typedef struct sb_sprite_uniform_index_t {
  *	Sprite batch.
  */
 typedef struct sb_sprite_batch_t {
-	/*
-	 *	number of sprite allocated.
-	 */
+
+	/*  Number of sprite allocated.   */
 	unsigned int num;           /*	Number of allocated sprites.    */
 	unsigned int numDraw;       /*	Number of sprite in batch.  */
 	unsigned int numlabelDraw;  /*	Number of label sprite in batch.    */
@@ -82,10 +71,11 @@ typedef struct sb_sprite_batch_t {
 	int numMaxTextures;         /*	Max number of texture units.	*/
 
 	/*	*/
-	int* texture;               /*  Texture index table.    */
+	unsigned int* textures;     /*  Texture index table.    */
 	SBSprite* sprite;           /*  Sprite buffer.  */
 	SBSprite* label;            /*  Label buffer.  */
 
+	/*  */
 	float scale;                /*  Global aligned world scale. */
 	float cameraPos[2];         /*  Camera position in world space. */
 	float rotation;             /*  Global rotation.    */
@@ -98,7 +88,7 @@ typedef struct sb_sprite_batch_t {
 	float viewmatrix[3][3];     /*  Cached view matrix for sprite transformations.   */
 
 	/*	cached uniform location.	*/
-	SBSpriteUniformIndex uniform;   /*  */
+	SBSpriteUniformIndex uniform;   /*  Shader uniform location.    */
 
 } SBSpriteBatch;
 
@@ -115,7 +105,7 @@ extern SBDECLSPEC const char* SBAPISTDENTRY sbGetVersion(void);
  * @remark ExCreateSpriteBatch will allocate 4096 sprite shape by default.
  * This can be changed by using ExSpriteBatchAllocateSprite.
  *
- * @param spriteBatch
+ * @param spriteBatch valid memory object.
  * @return Non NULL pointer if successfully.
  */
 extern SBDECLSPEC SBSpriteBatch* SBAPIENTRY sbCreateSpriteBatch(
@@ -123,7 +113,7 @@ extern SBDECLSPEC SBSpriteBatch* SBAPIENTRY sbCreateSpriteBatch(
 
 /**
  * Release resources associated with spritebatch.
- * @param spritebatch
+ * @param spritebatch valid spritebatch object.
  * @return non-zero if successfully.
  */
 extern SBDECLSPEC int SBAPIENTRY sbReleaseSpriteBatch(
@@ -131,7 +121,7 @@ extern SBDECLSPEC int SBAPIENTRY sbReleaseSpriteBatch(
 
 /**
  * Allocate sprite batch.
- * @param spritebatch
+ * @param spritebatch valid spritebatch object.
  * @param num number of sprites.
  */
 extern SBDECLSPEC void SBAPIENTRY sbSpriteBatchAllocateSprite(
@@ -139,50 +129,65 @@ extern SBDECLSPEC void SBAPIENTRY sbSpriteBatchAllocateSprite(
 
 /**
  * Begin spritebatch for adding sprite element for rendering.
- * @param spriteBatch
- * @param camerapos
- * @param scale
- * @param rotation
+ * @param spriteBatch valid spritebatch object.
+ * @param camerapos camera position
+ * @param scale global aligned scale.
+ * @param rotation rotation in radian.
  */
 extern SBDECLSPEC void SBAPIENTRY sbBeginSpriteBatch(
         SBSpriteBatch* SB_RESTRICT spriteBatch,
         const float* SB_RESTRICT camerapos, float scale, float rotation);
 
 /**
- * End and flush the spritebatch.
- * @param spriteBatch
+ * End and flush the spritebatch and subsequently
+ * invoke draw call.
+ * @param spriteBatch valid spritebatch object.
  */
 extern SBDECLSPEC void SBAPIENTRY sbEndSpriteBatch(SBSpriteBatch* spriteBatch);
 
 /**
- *	Draw the
- *
- *	@Return
+ * Draw sprite in pixel screen coordinate.
+ * @param spriteBatch valid spritebatch object.
+ * @param texture valid texture object.
+ * @param position 2D position in pixels.
+ * @param rect
+ * @param color normalized color RGBA.
+ * @param scale aligned scale.
+ * @param angle rotation in radian.
+ * @param depth from -1 - 1
  */
-extern SBDECLSPEC void SBAPIENTRY sbDrawSprite(SBSpriteBatch* spritebatch,
+extern SBDECLSPEC void SBAPIENTRY sbDrawSprite(SBSpriteBatch* spriteBatch,
 		SBTexture* texture, const float* position, const float* rect,
 		const float* color, float scale, float angle, float depth);
 
 /**
- *	Draw sprite in normalized screen coordinate.
- *
- *	@Return
+ * Draw sprite in normalized screen coordinate.
+ * @param spriteBatch valid spritebatch object.
+ * @param texture valid texture object.
+ * @param position
+ * @param rect
+ * @param color normalized color RGBA.
+ * @param scale aligned scale.
+ * @param angle rotation in radian.
+ * @param depth from -1 - 1
+ * @return
  */
-extern SBDECLSPEC int SBAPIENTRY sbDrawSpriteNormalize(
+extern SBDECLSPEC void SBAPIENTRY sbDrawSpriteNormalize(
 		SBSpriteBatch* spritebatch, SBTexture* texture, const float* position,
 		const float* rect, const float* color, float scale, float angle,
 		float depth);
+
 /**
- * Not implemented
+ * Draw
  * @param spritebatch
  * @param label
  * @param font
  * @param position
  * @param rect
- * @param color
- * @param scale
- * @param angle
- * @param depth
+ * @param color normalized color RGBA.
+ * @param scale aligned scale.
+ * @param angle rotation in radian.
+ * @param depth from -1 - 1
  * @return
  */
 extern SBDECLSPEC int SBAPIENTRY sbDrawSpriteLabel(SBSpriteBatch* spritebatch, const char* label,
@@ -196,10 +201,10 @@ extern SBDECLSPEC int SBAPIENTRY sbDrawSpriteLabel(SBSpriteBatch* spritebatch, c
  * @param font
  * @param position
  * @param rect
- * @param color
- * @param scale
- * @param angle
- * @param depth
+ * @param color normalized color RGBA.
+ * @param scale aligned scale.
+ * @param angle rotation in radian.
+ * @param depth from -1 - 1
  * @return
  */
 extern SBDECLSPEC int SBAPIENTRY sbDrawSpriteLabelNormalized(SBSpriteBatch* spritebatch, const char* label,
@@ -212,12 +217,13 @@ extern SBDECLSPEC int SBAPIENTRY sbDrawSpriteLabelNormalized(SBSpriteBatch* spri
  * @param texture
  * @param position
  * @param rect
- * @param color
- * @param scale
- * @param angle
- * @param depth
+ * @param color normalized color RGBA.
+ * @param scale aligned scale.
+ * @param angle rotation in radian.
+ * @param depth from -1 - 1
+ * @return
  */
-extern SBDECLSPEC void SBAPIENTRY sbAddSpriteNormalized(
+extern SBDECLSPEC int SBAPIENTRY sbAddSpriteNormalized(
         SBSpriteBatch* spritebatch, SBTexture* texture, const float* position,
         const float* rect, const float* color, float scale, float angle,
         float depth);
@@ -225,34 +231,34 @@ extern SBDECLSPEC void SBAPIENTRY sbAddSpriteNormalized(
 /**
  * Append sprite to spritebatch at back end
  * of the queue.
- * @param spritebatch
+ * @param spriteBatch
  * @param texture
  * @param position
  * @param rect
- * @param color
- * @param scale
- * @param angle
- * @param depth
+ * @param color normalized color RGBA.
+ * @param scale aligned scale.
+ * @param angle rotation in radian.
+ * @param depth from -1 - 1
  * @return
  */
-extern SBDECLSPEC int SBAPIENTRY sbAddSprite(SBSpriteBatch* spritebatch,
+extern SBDECLSPEC int SBAPIENTRY sbAddSprite(SBSpriteBatch* spriteBatch,
 		SBTexture* texture, const float* position, const float* rect,
 		const float* color, float scale, float angle, float depth);
 
 /**
  * Remove sprite object from sprite batch.
  *
- * @param spritebatch
- * @param index
+ * @param spritebatch valid spritebatch.
+ * @param index non-negative number.
  */
 extern SBDECLSPEC void SBAPIENTRY sbRemoveSprite(SBSpriteBatch* spritebatch,
         int index);
 
 /**
  * Flush current sprite buffer instantly to
- * the GPU.
+ * the GPU memory.
  *
- * @param spritebatch
+ * @param spritebatch valid spritebatch.
  * @return non-zero if successfully.
  */
 extern SBDECLSPEC int SBAPIENTRY sbFlushSpriteBatch(
@@ -261,7 +267,7 @@ extern SBDECLSPEC int SBAPIENTRY sbFlushSpriteBatch(
 /**
  * Display all sprite assigned to spritebatch.
  *
- * @param spritebatch
+ * @param spritebatch valid spritebatch object.
  */
 extern SBDECLSPEC void SBAPIENTRY sbDisplaySprite(SBSpriteBatch* spritebatch);
 

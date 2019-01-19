@@ -1,12 +1,13 @@
 #include"matrix.h"
+#include<math.h>
 
-void sbMatrix3x3Translation(float f_mat2[3][3], float camerapos[2]) {
-	f_mat2[0][0] = 1;
+void sbMatrix3x3Translation(float f_mat2[3][3], float pos[2]) {
+	f_mat2[0][0] = 1.0f;
 	f_mat2[1][0] = 0.0f;
-	f_mat2[2][0] = camerapos[0];
+	f_mat2[2][0] = pos[0];
 	f_mat2[0][1] = 0.0f;
-	f_mat2[1][1] = 1;
-	f_mat2[2][1] = camerapos[0];
+	f_mat2[1][1] = 1.0f;
+	f_mat2[2][1] = pos[1];
 	f_mat2[0][2] = 0.0f;
 	f_mat2[1][2] = 0.0f;
 	f_mat2[2][2] = 1.0f;
@@ -24,16 +25,39 @@ void sbMatrix3x3Scale(float f_mat2[3][3], float scale) {
 	f_mat2[2][2] = 1.0f;
 }
 
-void sbMatrix3x3MultiMatrix3x3(float lf_mat4[3][3], float rf_mat4[3][3], float outf_mat4[3][3]) {
-	outf_mat4[0][0] = lf_mat4[0][0] * rf_mat4[0][0] + lf_mat4[1][0] * rf_mat4[1][0] + lf_mat4[2][0] * rf_mat4[2][0];
-	outf_mat4[1][0] = lf_mat4[0][0] * rf_mat4[0][1] + lf_mat4[1][0] * rf_mat4[1][1] + lf_mat4[2][0] * rf_mat4[2][1];
-	outf_mat4[2][0] = lf_mat4[0][0] * rf_mat4[0][2] + lf_mat4[1][0] * rf_mat4[1][2] + lf_mat4[2][0] * rf_mat4[2][2];
+void sbMatrix3x3Rotation(float f_mat3[3][3], float rotation){
+	f_mat3[0][0] = cosf(rotation);
+	f_mat3[1][0] = -sinf(rotation);
+	f_mat3[2][0] = 0.0f;
+	f_mat3[0][1] = sinf(rotation);
+	f_mat3[1][1] = cosf(rotation);
+	f_mat3[2][1] = 0.0f;
+	f_mat3[0][2] = 0.0f;
+	f_mat3[1][2] = 0.0f;
+	f_mat3[2][2] = 1.0f;
+}
 
-	outf_mat4[0][1] = lf_mat4[0][1] * rf_mat4[0][0] + lf_mat4[1][1] * rf_mat4[1][0] + lf_mat4[2][1] * rf_mat4[2][0];
-	outf_mat4[1][1] = lf_mat4[0][1] * rf_mat4[0][1] + lf_mat4[1][1] * rf_mat4[1][1] + lf_mat4[2][1] * rf_mat4[2][1];
-	outf_mat4[2][1] = lf_mat4[0][1] * rf_mat4[0][2] + lf_mat4[1][1] * rf_mat4[1][2] + lf_mat4[2][1] * rf_mat4[2][2];
+void sbMatrix3x3MultiMatrix3x3(const float larg[3][3], const float rarg[3][3], float outf[3][3]) {
+	const float  a00 = larg[0][0], a01 =  larg[0][1], a02 = larg[0][2], a03 = larg[0][3],
+			a10 =    larg[1][0], a11 =  larg[1][1], a12 = larg[1][2], a13 = larg[1][3],
+			a20 =    larg[2][0], a21 =  larg[2][1], a22 = larg[2][2], a23 = larg[2][3],
+			a30 =    larg[3][0], a31 =  larg[3][1], a32 = larg[3][2], a33 = larg[3][3],
 
-	outf_mat4[0][2] = lf_mat4[0][2] * rf_mat4[0][0] + lf_mat4[1][2] * rf_mat4[1][0] + lf_mat4[2][2] * rf_mat4[2][0];
-	outf_mat4[1][2] = lf_mat4[0][2] * rf_mat4[0][1] + lf_mat4[1][2] * rf_mat4[1][1] + lf_mat4[2][2] * rf_mat4[2][1];
-	outf_mat4[2][2] = lf_mat4[0][2] * rf_mat4[0][2] + lf_mat4[1][2] * rf_mat4[1][2] + lf_mat4[2][2] * rf_mat4[2][2];
+			b00 = rarg[0][0], b01 = rarg[0][1], b02 = rarg[0][2], b03 = rarg[0][3],
+			b10 = rarg[1][0], b11 = rarg[1][1], b12 = rarg[1][2], b13 = rarg[1][3],
+			b20 = rarg[2][0], b21 = rarg[2][1], b22 = rarg[2][2], b23 = rarg[2][3],
+			b30 = rarg[3][0], b31 = rarg[3][1], b32 = rarg[3][2], b33 = rarg[3][3];
+
+	outf[0][0] = b00 * a00 + b01 * a10 + b02 * a20;
+	outf[0][1] = b00 * a01 + b01 * a11 + b02 * a21;
+	outf[0][2] = b00 * a02 + b01 * a12 + b02 * a22;
+
+	outf[1][0] = b10 * a00 + b11 * a10 + b12 * a20;
+	outf[1][1] = b10 * a01 + b11 * a11 + b12 * a21;
+	outf[1][2] = b10 * a02 + b11 * a12 + b12 * a22;
+
+	outf[2][0] = b20 * a00 + b21 * a10 + b22 * a20;
+	outf[2][1] = b20 * a01 + b21 * a11 + b22 * a21;
+	outf[2][2] = b20 * a02 + b21 * a12 + b22 * a22;
+
 }

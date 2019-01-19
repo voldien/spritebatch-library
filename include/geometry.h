@@ -87,13 +87,13 @@ extern SBDECLSPEC int SBAPIENTRY sbDestroyBuffer(unsigned int buffer);
  * @param buffer
  * @return
  */
-extern SBDECLSPEC void* SBAPIENTRY sbMapBuffer(unsigned int target, unsigned int buffer);
+extern SBDECLSPEC void* SBAPIENTRY sbMapBufferWOnly(unsigned int target, unsigned int buffer);
 
 /**
- * 
+ *
  * @param target
  */
-extern SBDECLSPEC void SBAPIENTRY sbUnmapBuffer(unsigned int target);
+extern SBDECLSPEC int SBAPIENTRY sbUnmapBuffer(unsigned int target);
 
 
 #ifdef __cplusplus	/* C++ environment	*/

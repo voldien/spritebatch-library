@@ -21,16 +21,16 @@
 #include"def.h"
 
 /**
- *
+ * Texture structure.
  */
 typedef struct sb_texture{
-	unsigned int target;            /*	*/
-	unsigned int texture;           /*	*/
-	unsigned int width;             /*	*/
-	unsigned int height;            /*	*/
-	unsigned int layer;             /*	*/
-	unsigned int type;              /*	*/
-	unsigned int internalformat;	/*	*/
+	unsigned int target;            /*	Texture target. */
+	unsigned int texture;           /*	Texture UID.    */
+	unsigned int width;             /*	Texture width in pixels.    */
+	unsigned int height;            /*	Texture height in pixels.   */
+	unsigned int layer;             /*	Number of layers.   */
+	unsigned int type;              /*	Internal data type per pixel channel.   */
+	unsigned int internalformat;	/*	Internal pixel channel format.    */
 }SBTexture;
 
 
@@ -56,14 +56,15 @@ extern SBDECLSPEC SBTexture* SBAPIENTRY sbCreateTexture(SBTexture* SB_RESTRICT t
         unsigned int target, int level, int internalFormat, int width,
         int height, int border, unsigned int format, unsigned int type,
         const void * SB_RESTRICT pixels);
+
 /**
- * Delete texture.
- * @param texture
+ * Delete texture. Releases texture resources from graphic memory.
+ * @param texture valid texture object.
  */
 extern SBDECLSPEC void SBAPIENTRY sbDeleteTexture(SBTexture* texture);
 
 /**
- * Check if texture is a opengl texture object and is valid.
+ * Check if texture is a OpenGL texture object and is valid.
  * @param texture
  * @return None zero if true.
  */

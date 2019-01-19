@@ -10,8 +10,9 @@
 	#include<GLES2/gl2.h>
 #else
 	#include<GL/gl.h>
-#endif
+#include <assert.h>
 
+#endif
 
 void sbGenBuffers(int n, unsigned int* buffers){
 	spbGLGenBuffersARB(n, buffers);
@@ -39,11 +40,15 @@ int sbDestroyBuffer(unsigned int buffer){
 	return spbGLIsBufferARB(buffer) != GL_FALSE;
 }
 
-void* sbMapBuffer(unsigned int target, unsigned int buffer){
+void* sbMapBufferWOnly(unsigned int target, unsigned int buffer){
 	spbGLBindBufferARB(target, buffer);
-	return spbGLMapBufferARB(target, GL_WRITE_ONLY_ARB);
+	void* data = spbGLMapBufferARB(target, GL_WRITE_ONLY_ARB);
+	assert(data);
+	return data;
 }
 
-void sbUnmapBuffer(unsigned int target){
-	spbGLUnmapBufferARB(target);
+int sbUnmapBuffer(unsigned int target){
+	GLboolean status = spbGLUnmapBufferARB(target);
+	assert(status == GL_TRUE);
+	return status;
 }

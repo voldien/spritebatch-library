@@ -25,26 +25,35 @@ extern "C"{
 #endif
 
 /**
- *
+ * Create right handed translation matrix.
  * @param tranmat
- * @param camerapos
+ * @param pos
  */
-extern SBDECLSPEC void SBAPIENTRY sbMatrix3x3Translation(float tranmat[3][3], float camerapos[2]);
+extern SBDECLSPEC void SBAPIENTRY sbMatrix3x3Translation(float tranmat[3][3], float pos[2]);
 
 /**
- *
+ * Create right handed scale matrix.
  * @param scalemat
  * @param scale
  */
 extern SBDECLSPEC void SBAPIENTRY sbMatrix3x3Scale(float scalemat[3][3], float scale);
 
+
+/**
+ * Create right handed scale matrix.
+ * @param scalemat
+ * @param scale
+ */
+extern SBDECLSPEC void SBAPIENTRY sbMatrix3x3Rotation(float scalemat[3][3], float rotation);
+
+
  /**
-  *
+  * Multiply two matrices.
   * @param matscale
   * @param tranmat
   * @param viewmatrix
   */
-extern SBDECLSPEC void SBAPIENTRY sbMatrix3x3MultiMatrix3x3(float matscale[3][3], float tranmat[3][3],
+extern SBDECLSPEC void SBAPIENTRY sbMatrix3x3MultiMatrix3x3(const float matscale[3][3], const float tranmat[3][3],
         float viewmatrix[3][3]);
 
 #ifdef __cplusplus	/* C++ environment	*/

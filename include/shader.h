@@ -1,6 +1,6 @@
 /**
 	Simple Sprite batch implementation using OpenGL.
-	Copyright (C) 2017  Valdemar Lindberg
+	Copyright (C) 2015  Valdemar Lindberg
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -33,38 +33,38 @@ extern "C"{
 #endif
 
 /**
- *	Load shader object from source glsl
+ *	Load shader object from source GLSL
  *	source code.
- * @param shad
+ * @param shader
  * @param cvertexSource
  * @param cfragmentSource
  * @param cgeometry_source
  * @return 0 if failed.
  */
-extern SBDECLSPEC int SBAPIENTRY sbCreateShaderv(SBShader* SB_RESTRICT shad,
+extern SBDECLSPEC int SBAPIENTRY sbCreateShaderv(SBShader* SB_RESTRICT shader,
         const char* SB_RESTRICT cvertexSource,
         const char* SB_RESTRICT cfragmentSource,
         const char* SB_RESTRICT cgeometry_source);
 
 /**
  * Check if shader object is a valid shader object.
- * @param shader
+ * @param shader valid shader object.
  * @return non-zero if valid, zero otherwise.
  */
 extern SBDECLSPEC int SBAPIENTRY sbIsShader(const SBShader* shader);
 
 /**
  * Delete shader object.
- * @param header
+ * @param shader valid shader object.
  * @return 0 if failed
  */
-extern SBDECLSPEC int SBAPIENTRY sbDeleteShaderProgram(SBShader* header);
+extern SBDECLSPEC int SBAPIENTRY sbDeleteShaderProgram(SBShader* shader);
 
 /**
- * Compile
- * @param source
- * @param flag
- * @return
+ * Compile GLSL shader.
+ * @param source main source code.
+ * @param flag type shader.
+ * @return non-negative number of successfully.
  */
 extern SBDECLSPEC int SBAPIENTRY sbCompileShaderSourcev(const char* source,
         unsigned int flag);
