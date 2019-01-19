@@ -19,7 +19,7 @@ const char *sbGetVersion(void) {
 	return SPB_VERSION;
 }
 
-SBSpriteBatch*  sbCreateSpriteBatch(SBSpriteBatch* spritebatch) {
+SBSpriteBatch *sbCreateSpriteBatch(SBSpriteBatch *spritebatch) {
 	int x;
 	int texture[512];
 	const int numSprites = 4096;
@@ -35,13 +35,13 @@ SBSpriteBatch*  sbCreateSpriteBatch(SBSpriteBatch* spritebatch) {
 	const uint32_t color_offset = 12 + 28;
 
 	/*	Load OpenGL functions.	*/
-	if(!sb_internal_load_gl_func())
+	if (!sb_internal_load_gl_func())
 		return NULL;
 
 	/*	Get	max combined texture units.	*/
 	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB,
-			&spritebatch->numMaxTextures);
-	spritebatch->textures = (int*)malloc(sizeof(unsigned int) * spritebatch->numMaxTextures);
+	              &spritebatch->numMaxTextures);
+	spritebatch->textures = (int *) malloc(sizeof(unsigned int) * spritebatch->numMaxTextures);
 	memset(spritebatch->textures, 0, sizeof(unsigned int) * spritebatch->numMaxTextures);
 	spritebatch->numTexture = 0;
 	assert(spritebatch->textures);
@@ -54,7 +54,7 @@ SBSpriteBatch*  sbCreateSpriteBatch(SBSpriteBatch* spritebatch) {
 	/*	*/
 	sbGenVertexArrays(1, &spritebatch->vao);
 	spbGLBindVertexArray(spritebatch->vao);
-	
+
 	/*	*/
 	spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, spritebatch->vbo);
 	spbGLEnableVertexAttribArrayARB(0);
@@ -64,30 +64,30 @@ SBSpriteBatch*  sbCreateSpriteBatch(SBSpriteBatch* spritebatch) {
 	spbGLEnableVertexAttribArrayARB(4);
 	spbGLEnableVertexAttribArrayARB(5);
 	spbGLVertexAttribPointerARB(0, 3, GL_FLOAT, GL_FALSE, sizeof(SBSprite),
-			(const void*) vertex_offset);
+	                            (const void *) vertex_offset);
 	spbGLVertexAttribPointerARB(1, 1, GL_FLOAT, GL_FALSE, sizeof(SBSprite),
-			(const void*) angle_offset);
+	                            (const void *) angle_offset);
 	spbGLVertexAttribPointerARB(2, 4, GL_FLOAT, GL_FALSE, sizeof(SBSprite),
-			(const void*) rect_offset);
+	                            (const void *) rect_offset);
 	spbGLVertexAttribPointerARB(3, 1, GL_INT, GL_FALSE, sizeof(SBSprite),
-(const void*) tex_offset);
+	                            (const void *) tex_offset);
 	spbGLVertexAttribPointerARB(4, 1, GL_FLOAT, GL_FALSE, sizeof(SBSprite),
-			(const void*) scale_offset);
+	                            (const void *) scale_offset);
 	spbGLVertexAttribPointerARB(5, 4, GL_FLOAT, GL_FALSE, sizeof(SBSprite),
-			(const void*) color_offset);
+	                            (const void *) color_offset);
 
 	spbGLBindVertexArray(0);
 
 	/*	Load sprite shader.	*/
 	if (!sbCreateShaderv(&spritebatch->spriteShader, gc_shader_spriteV,
-			gc_shader_spriteF, NULL)) {
+	                     gc_shader_spriteF, NULL)) {
 		/*	failure	*/
 		sbReleaseSpriteBatch(spritebatch);
 		return NULL;
 	}
 	/*  Load sprite label shader.   */
 	if (!sbCreateShaderv(&spritebatch->fontShader, gc_shader_labelV,
-                     gc_shader_labelF, NULL)) {
+	                     gc_shader_labelF, NULL)) {
 		/*	failure	*/
 		sbReleaseSpriteBatch(spritebatch);
 		return NULL;
@@ -102,9 +102,9 @@ SBSpriteBatch*  sbCreateSpriteBatch(SBSpriteBatch* spritebatch) {
 			spritebatch->spriteShader.program, "textures");
 
 	/*	Validate cache uniform locations.   */
-	if(spritebatch->uniform.locationScale == -1 ||
-	   spritebatch->uniform.locationTexture == -1 ||
-	   spritebatch->uniform.locationViewMatrix == -1){
+	if (spritebatch->uniform.locationScale == -1 ||
+	    spritebatch->uniform.locationTexture == -1 ||
+	    spritebatch->uniform.locationViewMatrix == -1) {
 		return NULL;
 	}
 
@@ -118,7 +118,7 @@ SBSpriteBatch*  sbCreateSpriteBatch(SBSpriteBatch* spritebatch) {
 
 	/*  TODO fix constant size. */
 	spbGLUniform1ivARB(spritebatch->uniform.locationTexture, nrTextures,
-			(const GLint*) &texture[0]);
+	                   (const GLint *) &texture[0]);
 
 	spbGLUseProgram(0);
 
@@ -142,7 +142,7 @@ SBSpriteBatch*  sbCreateSpriteBatch(SBSpriteBatch* spritebatch) {
 	return spritebatch;
 }
 
-int sbReleaseSpriteBatch(SBSpriteBatch* spritebatch) {
+int sbReleaseSpriteBatch(SBSpriteBatch *spritebatch) {
 	int status;
 
 	/*  Delete buffers. */
@@ -171,14 +171,14 @@ int sbReleaseSpriteBatch(SBSpriteBatch* spritebatch) {
 	return status;
 }
 
-void sbSpriteBatchAllocateSprite(SBSpriteBatch* spritebatch, unsigned int num) {
+void sbSpriteBatchAllocateSprite(SBSpriteBatch *spritebatch, unsigned int num) {
 
 	/*	Check for error.	*/
 	if (spritebatch == NULL || num <= 0)
 		return;
 
 	/*	Flush current buffer if exists.	*/
-	if(spbGLIsBufferARB(spritebatch->vbo) && spritebatch->sprite)
+	if (spbGLIsBufferARB(spritebatch->vbo) && spritebatch->sprite)
 		sbFlushSpriteBatch(spritebatch);
 
 	/*	Check if buffer has been generate.	*/
@@ -193,19 +193,19 @@ void sbSpriteBatchAllocateSprite(SBSpriteBatch* spritebatch, unsigned int num) {
 	spritebatch->num = num;
 	/*  Allocate sprite buffer on the graphic device.   */
 	sbSetBufferSize(GL_ARRAY_BUFFER_ARB, spritebatch->vbo,
-			spritebatch->num * sizeof(SBSprite), GL_DYNAMIC_DRAW);
+	                spritebatch->num * sizeof(SBSprite), GL_DYNAMIC_DRAW);
 	spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 }
 
-void sbBeginSpriteBatch(SBSpriteBatch* SB_RESTRICT spriteBatch,
-        const float* SB_RESTRICT camerapos, float scale, float rotation) {
+void sbBeginSpriteBatch(SBSpriteBatch *SB_RESTRICT spriteBatch,
+                        const float *SB_RESTRICT camerapos, float scale, float rotation) {
 	int i;
 	int rect[4];
 
 	/*  Reset sprite and texture counter.   */
 	spriteBatch->numDraw = 0;
 	spriteBatch->numlabelDraw = 0;
-	
+
 	/*	Get current size of the viewport.	*/
 	glGetIntegerv(GL_VIEWPORT, rect);
 	spriteBatch->width = (rect[2] - rect[0]);
@@ -228,7 +228,7 @@ void sbBeginSpriteBatch(SBSpriteBatch* SB_RESTRICT spriteBatch,
 	spriteBatch->numTexture = 0;
 }
 
-void sbEndSpriteBatch(SBSpriteBatch* spriteBatch) {
+void sbEndSpriteBatch(SBSpriteBatch *spriteBatch) {
 
 	/*  Flush sprite buffers to GPU Memory. */
 	sbFlushSpriteBatch(spriteBatch);
@@ -254,14 +254,14 @@ static void updateTextureTable(SBSpriteBatch *SB_RESTRICT spriteBatch, const SBT
 	}
 }
 
-void sbDrawSprite(SBSpriteBatch* spriteBatch, SBTexture* texture,
-		const float* position, const float* rect, const float* color,
-		float scale, float angle, float depth) {
+void sbDrawSprite(SBSpriteBatch *spriteBatch, SBTexture *texture,
+                  const float *position, const float *rect, const float *color,
+                  float scale, float angle, float depth) {
 
 	sbAddSprite(spriteBatch, texture, position, rect, color, scale, angle, depth);
 
 	if (spriteBatch->numDraw >= spriteBatch->num
-			|| spriteBatch->numTexture >= spriteBatch->numMaxTextures) {
+	    || spriteBatch->numTexture >= spriteBatch->numMaxTextures) {
 
 		/*  Flush if buffer is full.    */
 		sbEndSpriteBatch(spriteBatch);
@@ -271,7 +271,7 @@ void sbDrawSprite(SBSpriteBatch* spriteBatch, SBTexture* texture,
 
 
 void sbDrawSpriteNormalize(SBSpriteBatch *spritebatch, SBTexture *texture, const float *position,
-                                      const float *rect, const float *color, float scale, float angle, float depth) {
+                           const float *rect, const float *color, float scale, float angle, float depth) {
 
 	sbAddSpriteNormalized(spritebatch, texture, position, rect, color, scale, angle, depth);
 
@@ -297,7 +297,7 @@ int sbDrawSpriteLabel(SBSpriteBatch *spritebatch, const char *label, SBFont *fon
 	for (i = 0; i < len; i++) {
 		const int charIndex = label[i];
 		const float fontRect[4] = {font->tex_x1[charIndex], font->tex_x1[charIndex], font->tex_y1[charIndex],
-		                      font->tex_y2[charIndex]};
+		                           font->tex_y2[charIndex]};
 		const float charPos[] = {position[0] + xOffset, position[1] + yOffset};
 
 		/*  Draw.   */
@@ -318,8 +318,8 @@ int sbDrawSpriteLabelNormalized(SBSpriteBatch *spritebatch, const char *label,
 	const size_t len = strlen(label);
 	/*  Iterate through each character. */
 	for (i = 0; i < len; i++) {
-		const float x = position[0] * (float)spritebatch->width;
-		const float y = position[1] * (float)spritebatch->height;
+		const float x = position[0] * (float) spritebatch->width;
+		const float y = position[1] * (float) spritebatch->height;
 
 		const float normalizePos[2] = {x, y};
 		sbDrawSpriteLabel(spritebatch, label, font, normalizePos, rect, color, scale, angle, depth);
@@ -327,22 +327,22 @@ int sbDrawSpriteLabelNormalized(SBSpriteBatch *spritebatch, const char *label,
 
 }
 
-int sbAddSpriteNormalized(SBSpriteBatch* spritebatch, SBTexture* texture,
-		const float* position, const float* rect, const float* color,
-		float scale, float angle, float depth) {
+int sbAddSpriteNormalized(SBSpriteBatch *spritebatch, SBTexture *texture,
+                          const float *position, const float *rect, const float *color,
+                          float scale, float angle, float depth) {
 
-	SBTexture* tex;
+	SBTexture *tex;
 	int i;
 	int index;
 	unsigned int numDraw;
 	numDraw = spritebatch->numDraw;
-	SBSprite* sprite = &spritebatch->sprite[numDraw];
+	SBSprite *sprite = &spritebatch->sprite[numDraw];
 
-	if(spritebatch->numDraw == spritebatch->num)
+	if (spritebatch->numDraw == spritebatch->num)
 		return 0;
 
 	/*	Screen coordinate. [0,0] - [w,h], top left -> bottom right. to  normalized coordinate system.   */
-	sprite->pos[0] = 2.0f * position[0]  - 1.0f + (((float) texture->width) / ((float) spritebatch->width));
+	sprite->pos[0] = 2.0f * position[0] - 1.0f + (((float) texture->width) / ((float) spritebatch->width));
 	sprite->pos[1] = 2.0f * position[1] - 1.0f - (((float) texture->height) / ((float) spritebatch->height));
 	//sprite->pos[0] += spritebatch->cameraPos[0];
 	//sprite->pos[1] -= spritebatch->cameraPos[1];
@@ -388,45 +388,45 @@ int sbAddSpriteNormalized(SBSpriteBatch* spritebatch, SBTexture* texture,
 	return 1;
 }
 
-int sbAddSprite(SBSpriteBatch* spriteBatch, SBTexture* texture, const float* position,
-		const float* rect, const float* color, float scale, float angle,
-		float depth) {
+int sbAddSprite(SBSpriteBatch *spriteBatch, SBTexture *texture, const float *position,
+                const float *rect, const float *color, float scale, float angle,
+                float depth) {
 
 	/*  Normalize coordinate.    */
-	const float x = position[0] / (float)spriteBatch->width;
-	const float y = position[1] / (float)spriteBatch->height;
+	const float x = position[0] / (float) spriteBatch->width;
+	const float y = position[1] / (float) spriteBatch->height;
 
 	const float normalizePos[2] = {x, y};
-	sbAddSpriteNormalized(spriteBatch, texture, (const float*)normalizePos, rect, color, scale, angle, depth);
+	sbAddSpriteNormalized(spriteBatch, texture, (const float *) normalizePos, rect, color, scale, angle, depth);
 
 	return 1;
 }
 
-void sbRemoveSprite(SBSpriteBatch* spritebatch, int index) {
+void sbRemoveSprite(SBSpriteBatch *spritebatch, int index) {
 
 	/*  Check if index is valid.    */
 	if (index < spritebatch->numDraw) {
 
 		/*	Set last element in the index that going to be removed.*/
 		memcpy(&spritebatch->sprite[index],
-				&spritebatch->sprite[spritebatch->numDraw - 1],
-				sizeof(SBSprite));
+		       &spritebatch->sprite[spritebatch->numDraw - 1],
+		       sizeof(SBSprite));
 		spritebatch->numDraw--;
 	}
 }
 
-int sbFlushSpriteBatch(SBSpriteBatch* spritebatch) {
+int sbFlushSpriteBatch(SBSpriteBatch *spritebatch) {
 
-	if(spritebatch->numDraw > 0 ){
+	if (spritebatch->numDraw > 0) {
 		/*	DMA/Transfer sprite buffer to Graphic Memory.  */
-		void* pbuf = sbMapBufferWOnly(GL_ARRAY_BUFFER_ARB, spritebatch->vbo);
-		memcpy(pbuf, (const void*)spritebatch->sprite, spritebatch->numDraw * sizeof(SBSprite));
+		void *pbuf = sbMapBufferWOnly(GL_ARRAY_BUFFER_ARB, spritebatch->vbo);
+		memcpy(pbuf, (const void *) spritebatch->sprite, spritebatch->numDraw * sizeof(SBSprite));
 		return sbUnmapBuffer(GL_ARRAY_BUFFER_ARB);
 	}
 	return 1;
 }
 
-void sbDisplaySprite(SBSpriteBatch* spriteBatch) {
+void sbDisplaySprite(SBSpriteBatch *spriteBatch) {
 
 	unsigned int i;
 	float matscale[3][3];
@@ -437,16 +437,16 @@ void sbDisplaySprite(SBSpriteBatch* spriteBatch) {
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
 
 	/*  Only continue if elements needs to be drawn.    */
-	if(spriteBatch->numDraw <= 0 && spriteBatch->numlabelDraw <= 0)
+	if (spriteBatch->numDraw <= 0 && spriteBatch->numlabelDraw <= 0)
 		return;
 
 	/*	Load textures.  */
-	if(!spbGLBindTextures){
+	if (!spbGLBindTextures) {
 		for (i = 0; i < spriteBatch->numTexture; i++) {
 			glActiveTexture(GL_TEXTURE0 + i);
 			glBindTexture(GL_TEXTURE_2D, spriteBatch->textures[i]);
 		}
-	}else {
+	} else {
 		/*  Single gl call for binding all textures.    */
 		spbGLBindTextures(0, spriteBatch->numTexture, spriteBatch->textures);
 	}
@@ -464,7 +464,7 @@ void sbDisplaySprite(SBSpriteBatch* spriteBatch) {
 	/*	Update uniform variables.   */
 	spbGLUniform1fvARB(spriteBatch->uniform.locationScale, 1, &spriteBatch->scale);
 	spbGLUniformMatrix3fvARB(spriteBatch->uniform.locationViewMatrix, 1, GL_FALSE,
-			&spriteBatch->viewmatrix[0][0]);
+	                         &spriteBatch->viewmatrix[0][0]);
 
 	/*	Draw sprites.	*/
 	spbGLBindVertexArray(spriteBatch->vao);
