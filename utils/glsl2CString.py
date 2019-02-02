@@ -64,7 +64,7 @@ def main(argv):
     # Iterate through each files.
     for file in shadfiles:
         filepath = "{}/{}".format(dir, file)
-        if isfile(filepath) and file.endswith(".glsl"):
+        if isfile(filepath) and file.endswith((".glsl", ".vert", ".frag", ".geom", ".tesc", ".tesc", ".comp")):
             with codecs.open(filepath, 'r', encoding='utf8') as f:
                 # Convert text to c-string.
                 glsl = convert2CString(f.read())
