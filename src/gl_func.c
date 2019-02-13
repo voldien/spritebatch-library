@@ -42,6 +42,10 @@ PFNGLGETSHADERIVPROC spbGLGetShaderiv;
 PFNGLGETSHADERINFOLOGPROC spbGLGetShaderInfoLog;
 PFNGLVALIDATEPROGRAMPROC spbGLValidateProgram;
 
+PFNGLPROGRAMUNIFORM1IVPROC spbGLProgramUniform1iv;
+PFNGLPROGRAMUNIFORM1FVPROC spbGLProgramUniform1fv;
+PFNGLPROGRAMUNIFORMMATRIX3FVPROC spbGLProgramUniformMatrix3fv;
+
 /*  */
 PFNGLISPROGRAMARBPROC spbGLIsProgramARB;
 PFNGLUNIFORM1IVARBPROC spbGLUniform1ivARB;
@@ -111,6 +115,10 @@ int sb_internal_load_gl_func(void){
 	spbGLUniform1ivARB = (PFNGLUNIFORM1IVARBPROC)load_gl_func("glUniform1ivARB");
 	spbGLUniform1fvARB = (PFNGLUNIFORM1FVARBPROC)load_gl_func("glUniform1fvARB");
 	spbGLUniformMatrix3fvARB = (PFNGLUNIFORMMATRIX3FVARBPROC)load_gl_func("glUniformMatrix3fvARB");
+
+	spbGLProgramUniform1iv = (PFNGLPROGRAMUNIFORM1IVPROC)load_gl_func("glProgramUniform1iv");
+	spbGLProgramUniform1fv = (PFNGLPROGRAMUNIFORM1FVPROC)load_gl_func("glProgramUniform1fv");
+	spbGLProgramUniformMatrix3fv = (PFNGLPROGRAMUNIFORMMATRIX3FVPROC)load_gl_func("glProgramUniformMatrix3fv");
 
 	/*  */
 	spbGLGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)load_gl_func("glGenVertexArrays");
