@@ -39,23 +39,15 @@ extern "C"{
 #endif
 
 /**
- * Create spritebatch texture object.
- * @param texture
- * @param target
- * @param level
- * @param internalFormat
- * @param width
- * @param height
- * @param border
- * @param format
- * @param type
- * @param pixels
- * @return pointer address of texture object.
+ *
  */
 extern SBDECLSPEC SBTexture* SBAPIENTRY sbCreateTexture(SBTexture* SB_RESTRICT texture,
         unsigned int target, int level, int internalFormat, int width,
         int height, int border, unsigned int format, unsigned int type,
         const void * SB_RESTRICT pixels);
+
+extern SBDECLSPEC void SBAPIENTRY sbBindTexture(SBTexture* SB_RESTRICT texture, int index);
+extern SBDECLSPEC void SBAPIENTRY sbBindTextures(int* SB_RESTRICT textures, int index, int num);
 
 /**
  * Delete texture. Releases texture resources from graphic memory.
@@ -69,6 +61,7 @@ extern SBDECLSPEC void SBAPIENTRY sbDeleteTexture(SBTexture* texture);
  * @return None zero if true.
  */
 extern SBDECLSPEC int SBAPIENTRY sbIsTexture(const SBTexture* texture);
+extern SBDECLSPEC int SBAPIENTRY sbGetNumTextureUnits(int* units);
 
 #ifdef __cplusplus	/* C++ environment	*/
 }

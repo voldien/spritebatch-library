@@ -74,6 +74,26 @@ SBTexture* sbCreateTexture(SBTexture* SB_RESTRICT texture, unsigned int target, 
 		return texture;
 }
 
+void sbBindTexture(SBTexture* SB_RESTRICT texture, int index){
+	glActiveTexture(GL_TEXTURE0 + index);
+	glBindTexture(GL_TEXTURE_2D, texture->texture);
+}
+
+void sbBindTextures(int* SB_RESTRICT textures, int index, int num){
+	int i;
+	/*	Load textures.  */
+	if (!spbGLBindTextures) {
+		for (i = 0; i < num; i++) {
+			/*	TODO resolve.   */
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, textures[i]);
+		}
+	} else {
+		/*  Single gl call for binding all textures.    */
+		spbGLBindTextures(0, num, textures);
+	}
+}
+
 void sbDeleteTexture(SBTexture* texture){
 	if(sbIsTexture(texture))
 		glDeleteTextures(1, &texture->texture);
@@ -81,4 +101,9 @@ void sbDeleteTexture(SBTexture* texture){
 
 int sbIsTexture(const SBTexture* texture){
 	return glIsTexture(texture->texture) == GL_TRUE;
+}
+
+int sbGetNumTextureUnits(int* units){
+	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB,
+	              units);
 }
