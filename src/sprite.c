@@ -181,7 +181,7 @@ void sbSpriteBatchAllocateSprite(SBSpriteBatch *spritebatch, unsigned int num) {
 	if (spbGLIsBufferARB(spritebatch->vbo) && spritebatch->sprite)
 		sbFlushSpriteBatch(spritebatch);
 
-	/*	Check if buffer has been generate.	*/
+	/*	Check if buffer has been created.	*/
 	if (spbGLIsBufferARB(spritebatch->vbo) == 0) {
 		/*  Create vertex buffer.   */
 		sbGenBuffers(1, &spritebatch->vbo);
@@ -199,7 +199,6 @@ void sbSpriteBatchAllocateSprite(SBSpriteBatch *spritebatch, unsigned int num) {
 
 void sbBeginSpriteBatch(SBSpriteBatch *SB_RESTRICT spriteBatch,
                         const float *SB_RESTRICT camerapos, float scale, float rotation) {
-	int i;
 	int rect[4];
 
 	/*  Reset sprite and texture counter.   */
@@ -208,8 +207,8 @@ void sbBeginSpriteBatch(SBSpriteBatch *SB_RESTRICT spriteBatch,
 
 	/*	Get current size of the viewport.	*/
 	glGetIntegerv(GL_VIEWPORT, rect);
-	spriteBatch->width = (rect[2] - rect[0]);
-	spriteBatch->height = (rect[3] - rect[1]);
+	spriteBatch->width = (unsigned int)(rect[2] - rect[0]);
+	spriteBatch->height = (unsigned int)(rect[3] - rect[1]);
 	spriteBatch->scale = scale;
 	spriteBatch->rotation = rotation;
 
@@ -265,7 +264,9 @@ void sbDrawSprite(SBSpriteBatch *spriteBatch, SBTexture *texture,
 
 		/*  Flush if buffer is full.    */
 		sbEndSpriteBatch(spriteBatch);
-		sbBeginSpriteBatch(spriteBatch, &spriteBatch->cameraPos, spriteBatch->scale, spriteBatch->rotation);
+
+		const float cameraPos[2] = {-spriteBatch->cameraPos[0], spriteBatch->cameraPos[1]};
+		sbBeginSpriteBatch(spriteBatch, cameraPos, spriteBatch->scale, spriteBatch->rotation);
 	}
 }
 
@@ -324,15 +325,13 @@ int sbDrawSpriteLabelNormalized(SBSpriteBatch *spritebatch, const char *label,
 		const float normalizePos[2] = {x, y};
 		sbDrawSpriteLabel(spritebatch, label, font, normalizePos, rect, color, scale, angle, depth);
 	}
-
+	return 1;
 }
 
 int sbAddSpriteNormalized(SBSpriteBatch *spritebatch, SBTexture *texture,
                           const float *position, const float *rect, const float *color,
                           float scale, float angle, float depth) {
 
-	SBTexture *tex;
-	int i;
 	int index;
 	unsigned int numDraw;
 	numDraw = spritebatch->numDraw;
@@ -344,8 +343,6 @@ int sbAddSpriteNormalized(SBSpriteBatch *spritebatch, SBTexture *texture,
 	/*	Screen coordinate. [0,0] - [w,h], top left -> bottom right. to  normalized coordinate system.   */
 	sprite->pos[0] = 2.0f * position[0] - 1.0f + (((float) texture->width) / ((float) spritebatch->width));
 	sprite->pos[1] = 2.0f * position[1] - 1.0f - (((float) texture->height) / ((float) spritebatch->height));
-	//sprite->pos[0] += spritebatch->cameraPos[0];
-	//sprite->pos[1] -= spritebatch->cameraPos[1];
 	sprite->pos[2] = depth;
 
 	/*  Compute view rectangle. */
@@ -377,10 +374,10 @@ int sbAddSpriteNormalized(SBSpriteBatch *spritebatch, SBTexture *texture,
 	sprite->scale = scale;
 
 	/*  Update texture index table. */
-	updateTextureTable(spritebatch, texture);
+	index = updateTextureTable(spritebatch, texture);
 
 	/*	sprite texture index.	*/
-	sprite->texture = (GLint) i;
+	sprite->texture = (GLint) index;
 
 	/*	Update sprite count.    */
 	spritebatch->numDraw++;
@@ -396,6 +393,7 @@ int sbAddSprite(SBSpriteBatch *spriteBatch, SBTexture *texture, const float *pos
 	const float x = position[0] / (float) spriteBatch->width;
 	const float y = position[1] / (float) spriteBatch->height;
 
+	/*  */
 	const float normalizePos[2] = {x, y};
 	sbAddSpriteNormalized(spriteBatch, texture, (const float *) normalizePos, rect, color, scale, angle, depth);
 
@@ -417,8 +415,10 @@ void sbRemoveSprite(SBSpriteBatch *spritebatch, int index) {
 
 int sbFlushSpriteBatch(SBSpriteBatch *spritebatch) {
 
+	/*  */
 	if (spritebatch->numDraw > 0) {
 		/*	DMA/Transfer sprite buffer to Graphic Memory.  */
+
 		void *pbuf = sbMapBufferWOnly(GL_ARRAY_BUFFER_ARB, spritebatch->vbo);
 		memcpy(pbuf, (const void *) spritebatch->sprite, spritebatch->numDraw * sizeof(SBSprite));
 		return sbUnmapBuffer(GL_ARRAY_BUFFER_ARB);
