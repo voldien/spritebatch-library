@@ -440,16 +440,8 @@ void sbDisplaySprite(SBSpriteBatch *spriteBatch) {
 	if (spriteBatch->numDraw <= 0 && spriteBatch->numlabelDraw <= 0)
 		return;
 
-	/*	Load textures.  */
-	if (!spbGLBindTextures) {
-		for (i = 0; i < spriteBatch->numTexture; i++) {
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, spriteBatch->textures[i]);
-		}
-	} else {
-		/*  Single gl call for binding all textures.    */
-		spbGLBindTextures(0, spriteBatch->numTexture, spriteBatch->textures);
-	}
+	/*	Bind textures.  */
+	sbBindTextures(spriteBatch->textures, 0, spriteBatch->numTexture);
 
 	/*	Load shader.    */
 	sbBindShader(&spriteBatch->spriteShader);
