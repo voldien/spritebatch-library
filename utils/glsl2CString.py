@@ -17,7 +17,7 @@
 import os
 import sys
 from os.path import isfile, join
-from shutil import copyfile
+from shutil import move
 import codecs
 
 HEADERNAME = "shaders.h"
