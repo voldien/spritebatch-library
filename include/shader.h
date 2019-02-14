@@ -33,6 +33,31 @@ extern "C"{
 #endif
 
 /**
+ *
+ * @param shader
+ */
+extern SBDECLSPEC void SBAPIENTRY sbBindShader(const SBShader* shader);
+
+/**
+ *
+ * @param shader
+ * @param name
+ * @return
+ */
+extern SBDECLSPEC int SBAPIENTRY sbGetShaderLocation(const SBShader *shader, const char *name);
+
+
+extern void setShaderUniform1iv(SBShader* SB_RESTRICT shader, int location,
+                                int count, const int* SB_RESTRICT pvalue);
+
+extern void setShaderUniform1fv(SBShader* SB_RESTRICT shader, int location,
+                                int count, const float* SB_RESTRICT pvalue);
+
+extern void setShaderUniformMatrix3x3fv(SBShader *SB_RESTRICT shader,
+                                        int location, int count, const float *SB_RESTRICT pvalue);
+
+
+/**
  *	Load shader object from source GLSL
  *	source code.
  * @param shader

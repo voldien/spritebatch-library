@@ -39,6 +39,62 @@ unsigned int sbGetGLSLVersion(void){
 	}
 }
 
+SBShader prevshader = {0};
+SBShader *preshader = &prevshader;
+
+static void sbGetCurrentShader(SBShader *shader) {
+	glGetIntegerv(GL_CURRENT_PROGRAM, &shader->program);
+}
+
+void sbBindShader(const SBShader *shader) {
+	if (shader == NULL)
+		spbGLUseProgram(0);
+	else
+		spbGLUseProgram(shader->program);
+}
+
+int sbGetShaderLocation(const SBShader *shader, const char *name){
+	return spbGLGetUniformLocation(shader->program, name);
+}
+
+
+void setShaderUniform1iv(SBShader *SB_RESTRICT shader, int location, int count,
+                         const int *SB_RESTRICT pvalue) {
+	if (spbGLProgramUniform1iv) {
+		spbGLProgramUniform1iv(shader->program, location, count, pvalue);
+	} else {
+		sbGetCurrentShader(preshader);
+		sbBindShader(shader);
+		spbGLUniform1ivARB(location, count, pvalue);
+		sbBindShader(preshader);
+	}
+}
+
+
+void setShaderUniform1fv(SBShader *SB_RESTRICT shader, int location, int count,
+                         const float *SB_RESTRICT pvalue) {
+	if (spbGLProgramUniform1fv) {
+		spbGLProgramUniform1fv(shader->program, location, count, pvalue);
+	} else {
+		sbGetCurrentShader(preshader);
+		sbBindShader(shader);
+		spbGLUniform1fvARB(location, count, pvalue);
+		sbBindShader(preshader);
+	}
+}
+
+void setShaderUniformMatrix3x3fv(SBShader *SB_RESTRICT shader, int location, int count,
+                                 const float *SB_RESTRICT pvalue) {
+	if (spbGLProgramUniformMatrix3fv) {
+		spbGLProgramUniformMatrix3fv(shader->program, location, count, GL_FALSE, (const GLfloat *) pvalue);
+	} else {
+		sbGetCurrentShader(preshader);
+		sbBindShader(shader);
+		spbGLUniformMatrix3fvARB(location, count, GL_FALSE, (const GLfloat *) pvalue);
+		sbBindShader(preshader);
+	}
+}
+
 int sbCreateShaderv(SBShader* shader, const char* cvertexSource,
 		const char* cfragmentSource, const char* cgeometrySource) {
 
