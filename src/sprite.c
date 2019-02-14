@@ -94,12 +94,12 @@ SBSpriteBatch *sbCreateSpriteBatch(SBSpriteBatch *spritebatch) {
 	}
 
 	/*	Cache sprite uniform location.	*/
-	spritebatch->uniform.locationViewMatrix = spbGLGetUniformLocation(
-			spritebatch->spriteShader.program, "gmat");
-	spritebatch->uniform.locationScale = spbGLGetUniformLocation(
-			spritebatch->spriteShader.program, "gscale");
-	spritebatch->uniform.locationTexture = spbGLGetUniformLocation(
-			spritebatch->spriteShader.program, "textures");
+	spritebatch->uniform.locationViewMatrix = sbGetShaderLocation(
+			&spritebatch->spriteShader, "gmat");
+	spritebatch->uniform.locationScale = sbGetShaderLocation(
+			&spritebatch->spriteShader, "gscale");
+	spritebatch->uniform.locationTexture = sbGetShaderLocation(
+			&spritebatch->spriteShader, "textures");
 
 	/*	Validate cache uniform locations.   */
 	if (spritebatch->uniform.locationScale == -1 ||
@@ -451,8 +451,8 @@ void sbDisplaySprite(SBSpriteBatch *spriteBatch) {
 		spbGLBindTextures(0, spriteBatch->numTexture, spriteBatch->textures);
 	}
 
-	/*	*/
-	spbGLUseProgram(spriteBatch->spriteShader.program);
+	/*	Load shader.    */
+	sbBindShader(&spriteBatch->spriteShader);
 
 	/*	Update view matrix and global scale*/
 	sbMatrix3x3Translation(tranmat, spriteBatch->cameraPos);
@@ -462,9 +462,8 @@ void sbDisplaySprite(SBSpriteBatch *spriteBatch) {
 	sbMatrix3x3MultiMatrix3x3(matscale, TR, spriteBatch->viewmatrix);
 
 	/*	Update uniform variables.   */
-	spbGLUniform1fvARB(spriteBatch->uniform.locationScale, 1, &spriteBatch->scale);
-	spbGLUniformMatrix3fvARB(spriteBatch->uniform.locationViewMatrix, 1, GL_FALSE,
-	                         &spriteBatch->viewmatrix[0][0]);
+	setShaderUniform1fv(&spriteBatch->spriteShader, spriteBatch->uniform.locationScale, 1, &spriteBatch->scale);
+	setShaderUniformMatrix3x3fv(&spriteBatch->spriteShader, spriteBatch->uniform.locationViewMatrix, 1, &spriteBatch->viewmatrix[0][0]);
 
 	/*	Draw sprites.	*/
 	spbGLBindVertexArray(spriteBatch->vao);
