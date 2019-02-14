@@ -40,6 +40,14 @@ def convert2CString(cpbuf):
 
     return stringbuf[0:len(stringbuf) - 1]
 
+def variable_extension(path):
+    path_extension = path.split('.')[-1]
+    print(path_extension)
+    extensions = {"vert" : "vs", "frag" : "fs", "geom" : "ge", "tesc" : "tec", "tese" : "tes", "comp" : "cm"}
+    if path_extension in extensions:
+        return "_{}".format(extensions[path_extension])
+    return ""
+
 
 def main(argv):
     if len(argv) != 2:
@@ -58,19 +66,20 @@ def main(argv):
     cfile = codecs.open(cpath, 'w', encoding='utf8')
 
     #
-    cfile.write("#include\"shader.h\"\n")
+    cfile.write("#include\"{}\"\n".format(HEADERNAME))
     header.write("#ifndef _SPRITE_SHADER_\n#define _SPRITE_SHADER_ 1\n")
 
     # Iterate through each files.
     for file in shadfiles:
         filepath = "{}/{}".format(dir, file)
-        if isfile(filepath) and file.endswith((".glsl", ".vert", ".frag", ".geom", ".tesc", ".tesc", ".comp")):
+        if isfile(filepath) and file.endswith((".glsl", ".vert", ".frag", ".geom", ".tesc", ".tese", ".comp")):
             with codecs.open(filepath, 'r', encoding='utf8') as f:
                 # Convert text to c-string.
                 glsl = convert2CString(f.read())
                 cvariable = file.split('.')[0]
                 cvariable.replace('.', '_')
                 cvariable = "gc_shader_{}".format(cvariable)
+                cvariable += variable_extension(filepath)
 
                 # update header.
                 header.write("extern const char* {};\n".format(cvariable))
@@ -88,8 +97,8 @@ def main(argv):
     header.close()
 
     # Copy file to directory.
-    copyfile(headpath, "./include/{}".format(HEADERNAME))
-    copyfile(cpath, "./src/{}".format(CNAME))
+    move(headpath, "./include/{}".format(HEADERNAME))
+    move(cpath, "./src/{}".format(CNAME))
 
     print("Finish converting files from directory {} to {}:{}".format(argv[1], headpath, cpath))
 
