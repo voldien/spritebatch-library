@@ -18,13 +18,42 @@
  */
 #ifndef _TEST_BASE_H_
 #define _TEST_BASE_H_ 1
+
 #include <SDL2/SDL.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Create OpenGL window.
  * @return non-null if successfully.
  */
 extern SDL_Window *createWindow(void);
+
+/**
+ * Delete window and its associated resources.
+ * @param window
+ */
+extern void deleteWindow(SDL_Window *window);
+
+/**
+ * Set window title.
+ * @param window
+ * @param format
+ * @param ...
+ */
+extern void windowTitle(SDL_Window *window, const char *format, ...);
+
+/**
+ * 
+ * @param window
+ * @param width
+ * @param height
+ */
+extern void windowSetSize(SDL_Window *window, int width, int height);
+
+extern void windowResizable(SDL_Window *pWindow, int i);
 
 /**
  * Enable OpenGL debug.
@@ -40,5 +69,9 @@ extern void init(void);
  * Release resources.
  */
 extern void deinit(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

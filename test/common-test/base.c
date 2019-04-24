@@ -74,7 +74,9 @@ SDL_Window *createWindow(void) {
 	printf("Version: %s\n", glGetString(GL_VERSION));
 
 	/*	Enable debug.	*/
+#if defined(_DEBUG)
 	spEnableDebug();
+#endif
 
 	/*	Setup the rendering pipeline.	*/
 	glDisable(GL_DEPTH_TEST);
@@ -92,7 +94,41 @@ SDL_Window *createWindow(void) {
 	/*  Enable v-sync.  */
 	SDL_GL_SetSwapInterval(SDL_TRUE);
 
+
 	return window;
+}
+
+
+void deleteWindow(SDL_Window *window) {
+
+	SDL_GL_DeleteContext(SDL_GL_GetCurrentContext());
+	SDL_DestroyWindow(window);
+}
+
+
+
+void windowTitle(SDL_Window *window, const char *format, ...) {
+	char title[128];
+
+	/*	Create title for window.	*/
+	sprintf(title, "SpriteBatch Test - %s", "");
+
+	va_list vl;
+
+	va_start(vl, format);
+	vsprintf(title, format, vl);
+	va_end(vl);
+
+	SDL_SetWindowTitle(window, title);
+}
+
+void windowSetSize(SDL_Window *window, int width, int height) {
+	SDL_SetWindowSize(window, width, height);
+}
+
+
+void windowResizable(SDL_Window *pWindow, int i) {
+	SDL_SetWindowResizable(pWindow, i);
 }
 
 void init(void) {
