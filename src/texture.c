@@ -23,9 +23,9 @@
 #endif
 
 
-SBTexture* sbCreateTexture(SBTexture* SB_RESTRICT texture, unsigned int target, int level,
-        int internalFormat, int width, int height, int border,
-        unsigned int format, unsigned int type, const void * SB_RESTRICT pixels) {
+SBTexture *sbCreateTexture(SBTexture *SB_RESTRICT texture, unsigned int target, int level,
+                           int internalFormat, int width, int height, int border,
+                           unsigned int format, unsigned int type, const void *SB_RESTRICT pixels) {
 
 	assert(texture);
 
@@ -38,8 +38,8 @@ SBTexture* sbCreateTexture(SBTexture* SB_RESTRICT texture, unsigned int target, 
 
 	/*	Generate texture object.	*/
 	glGenTextures(1, &texture->texture);
-	glBindTexture(target, texture->texture);
 	glPixelStorei(GL_PACK_ALIGNMENT, 4);
+	glBindTexture(target, texture->texture);
 
 	/*	Create texture.	*/
 	switch (target) {
@@ -74,7 +74,7 @@ SBTexture* sbCreateTexture(SBTexture* SB_RESTRICT texture, unsigned int target, 
 		return texture;
 }
 
-void sbBindTexture(SBTexture* SB_RESTRICT texture, int index){
+void sbBindTexture(SBTexture *SB_RESTRICT texture, int index) {
 	glActiveTexture(GL_TEXTURE0 + index);
 	glBindTexture(GL_TEXTURE_2D, texture->texture);
 }

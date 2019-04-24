@@ -14,11 +14,11 @@
 
 #endif
 
-void sbGenBuffers(int n, unsigned int* buffers){
+void sbGenBuffers(int n, unsigned int *buffers) {
 	spbGLGenBuffersARB(n, buffers);
 }
 
-int sbCreateVBO(unsigned int target, unsigned int size, unsigned int mode){
+int sbCreateVBO(unsigned int target, unsigned int size, unsigned int mode) {
 	unsigned int vbo;
 	sbGenBuffers(1, &vbo);
 	spbGLBindBufferARB(target, vbo);
@@ -26,28 +26,28 @@ int sbCreateVBO(unsigned int target, unsigned int size, unsigned int mode){
 	return vbo;
 }
 
-void sbSetBufferSize(unsigned int target, unsigned int buffer, unsigned int size, unsigned int mode){
+void sbSetBufferSize(unsigned int target, unsigned int buffer, unsigned int size, unsigned int mode) {
 	spbGLBindBufferARB(target, buffer);
 	spbGLBufferDataARB(target, size, NULL, mode);
 }
 
-void sbGenVertexArrays(int n, unsigned int* arg){
-	spbGLGenVertexArrays((GLsizei)n, arg);
+void sbGenVertexArrays(int n, unsigned int *arg) {
+	spbGLGenVertexArrays((GLsizei) n, arg);
 }
 
-int sbDestroyBuffer(unsigned int buffer){
+int sbDestroyBuffer(unsigned int buffer) {
 	spbGLDeleteBuffersARB(1, &buffer);
 	return spbGLIsBufferARB(buffer) != GL_FALSE;
 }
 
-void* sbMapBufferWOnly(unsigned int target, unsigned int buffer){
+void *sbMapBufferWOnly(unsigned int target, unsigned int buffer) {
 	spbGLBindBufferARB(target, buffer);
-	void* data = spbGLMapBufferARB(target, GL_WRITE_ONLY_ARB);
+	void *data = spbGLMapBufferARB(target, GL_WRITE_ONLY_ARB);
 	assert(data);
 	return data;
 }
 
-int sbUnmapBuffer(unsigned int target){
+int sbUnmapBuffer(unsigned int target) {
 	GLboolean status = spbGLUnmapBufferARB(target);
 	assert(status == GL_TRUE);
 	return status;

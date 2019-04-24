@@ -41,6 +41,14 @@ extern SBDECLSPEC void SBAPIENTRY sbBindBuffer(int target, int buffer);
 /**
  *
  * @param target
+ * @param buffer
+ * @return
+ */
+extern SBDECLSPEC int SBAPIENTRY sbIsBuffer(int buffer);
+
+/**
+ *
+ * @param target
  * @param size
  * @param mode
  * @return

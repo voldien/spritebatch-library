@@ -29,7 +29,7 @@ extern "C"{
 /**
  * Font structure.
  */
-typedef struct sb_font_t{
+typedef struct sb_font_t {
 	SBTexture texture;          /*  Font texture.   */
 	unsigned int numChar;       /*  Number of character.   */
 	float* advance;             /*  */

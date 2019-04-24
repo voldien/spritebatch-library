@@ -14,27 +14,28 @@
 	#include<GLES2/gl2.h>
 #else
 	#include<GL/gl.h>
+
 #endif
 
-unsigned int sbGetGLSLVersion(void){
+unsigned int sbGetGLSLVersion(void) {
 
 	unsigned int version;
 	char glstring[128] = {0};
-	char* wspac;
+	char *wspac;
 
 	/*	Extract version number.	*/
-	strcpy(glstring, (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+	strcpy(glstring, (const char *) glGetString(GL_SHADING_LANGUAGE_VERSION));
 	wspac = strstr(glstring, " ");
-	if(wspac){
+	if (wspac) {
 		*wspac = '\0';
 	}
-	if(strstr(glstring, ".") != NULL){
-		unsigned int major = (unsigned int)(glstring[0] - '0') * 100;
-		unsigned int minor = (unsigned int)(glstring[2] - '0') * 10;
+	if (strstr(glstring, ".") != NULL) {
+		unsigned int major = (unsigned int) (glstring[0] - '0') * 100;
+		unsigned int minor = (unsigned int) (glstring[2] - '0') * 10;
 
-		return  major + minor;
-	}else{
-		version = (unsigned int)strtof(glstring, NULL) * 100;
+		return major + minor;
+	} else {
+		version = (unsigned int) strtof(glstring, NULL) * 100;
 		return version;
 	}
 }

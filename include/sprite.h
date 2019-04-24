@@ -22,7 +22,7 @@
 #include"shader.h"
 #include"font.h"
 
-#ifdef __cplusplus	/*	C++ environment	*/
+#ifdef __cplusplus	/*	C++ environment */
 extern "C" {
 #endif
 
@@ -75,19 +75,21 @@ typedef struct sb_sprite_batch_t {
 	SBSprite* sprite;           /*  Sprite buffer.  */
 	SBSprite* label;            /*  Label buffer.  */
 
-	/*  */
+	/*  View space. */
 	float scale;                /*  Global aligned world scale. */
+	float scaleY;               /*  */
 	float cameraPos[2];         /*  Camera position in world space. */
 	float rotation;             /*  Global rotation.    */
 
-	/*	*/
+	/*	view matrix.	*/
+	float viewmatrix[3][3];     /*  Cached view matrix for sprite transformations.   */
+	float projectMatrix[3][3];  /*  */
+
+	/*	Screen space.   */
 	unsigned int width;         /*  Viewport width from sbBeginSpriteBatch. */
 	unsigned int height;        /*  Viewport height from sbBeginSpriteBatch. */
 
-	/*	view matrix.	*/
-	float viewmatrix[3][3];     /*  Cached view matrix for sprite transformations.   */
-
-	/*	cached uniform location.	*/
+	/*	cached uniform locations.	*/
 	SBSpriteUniformIndex uniform;   /*  Shader uniform location.    */
 
 } SBSpriteBatch;
@@ -129,12 +131,11 @@ extern SBDECLSPEC void SBAPIENTRY sbSpriteBatchAllocateSprite(
 
 
 /**
- *
- * @param spritebatch
+ * Enable geometric rotation.
+ * @param spritebatch valid spritebatch object.
  * @param rotation
  */
 extern SBDECLSPEC int SBAPIENTRY sbEnableRotation(SBSpriteBatch* spritebatch, int rotation);
-
 
 /**
  * Begin spritebatch for adding sprite element for rendering.
@@ -144,9 +145,8 @@ extern SBDECLSPEC int SBAPIENTRY sbEnableRotation(SBSpriteBatch* spritebatch, in
  * @param rotation rotation in radian.
  */
 extern SBDECLSPEC void SBAPIENTRY sbBeginSpriteBatch(
-        SBSpriteBatch* SB_RESTRICT spriteBatch,
-        const float* SB_RESTRICT camerapos, float scale, float rotation);
-
+		SBSpriteBatch *SB_RESTRICT spriteBatch,
+		const float *SB_RESTRICT camerapos, float scale, float rotation);
 /**
  * End and flush the spritebatch and subsequently
  * invoke draw call.
