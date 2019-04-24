@@ -19,8 +19,9 @@
 #include"sprite.h"
 #include"base.h"
 #include<stdlib.h>
+#include<GL/glew.h>
 #include<GL/gl.h>
-#include <assert.h>
+#include<assert.h>
 
 int main(int argc, const char **argv) {
 
@@ -34,6 +35,8 @@ int main(int argc, const char **argv) {
 	SDL_Window *window = createWindow();
 	assert(window);
 
+	glewInit();
+
 	SBTexture texture;
 
 	/*	*/
@@ -41,7 +44,7 @@ int main(int argc, const char **argv) {
 	SDL_Event event = {0};
 	int visable;
 	uint8_t pixel[4] = {0xFF, 0xFF, 0xFF, 0xFF};
-	SBFont font;
+	SBFont* font;
 	float camera[2];
 	float zoom = 1.0;
 
@@ -83,8 +86,8 @@ int main(int argc, const char **argv) {
 					}
 					break;
 				case SDL_MOUSEMOTION:
-					camera[0] = event.motion.x / 1024.0f;
-					camera[1] = event.motion.y / 1024.0f;
+					camera[0] = event.motion.x / 10.0f;
+					camera[1] = event.motion.y / 10.0f;
 					break;
 				case SDL_MOUSEWHEEL:
 					zoom += event.wheel.y / 10.0f;
@@ -126,11 +129,24 @@ int main(int argc, const char **argv) {
 		/*	Draw pixel in screen space with normalized coordinates.	*/
 		sbBeginSpriteBatch(&spriteBatch, camera, zoom, 0.0f);
 
-		const int n = 150;
+		const float time = (SDL_GetPerformanceCounter()) / 1000000000.0f;
+		unsigned long delta = (SDL_GetPerformanceCounter - pretime);
+		pretime = SDL_GetPerformanceCounter();
+
+
+		const int n = 1500;
 		for(int i = 0; i < n; i++){
-			float pos[2] = {-1.0f + 2.0f * (float)i / (float)n, -1.0f + 2.0f
-				   * (float)i / (float)n};
-			sbDrawSpriteNormalize(&spriteBatch, &texture, pos, NULL, NULL, 10.0f, 0.0f, 0.0f);
+			const float r = 100.0f + n;
+			const float x = r * cosf(time + n);
+			const float y = r * sinf(time + n);
+
+			const float t = 300.0f;
+			const float hx = -1.0f + 2.0f * (float)x / t;
+			const float hy = -1.0f + 2.0f * (float)y / t;
+
+			float pos[2] = {hx, hy};
+			float color[] = {1,0,0,1};
+			sbDrawSpriteNormalize(&spriteBatch, &texture, pos, NULL, color, 10.0f, 0.0f, 0.0f);
 		}
 
 		sbEndSpriteBatch(&spriteBatch);

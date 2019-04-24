@@ -125,7 +125,16 @@ extern SBDECLSPEC int SBAPIENTRY sbReleaseSpriteBatch(
  * @param num number of sprites.
  */
 extern SBDECLSPEC void SBAPIENTRY sbSpriteBatchAllocateSprite(
-		SBSpriteBatch* spritebatch, unsigned int num);
+		SBSpriteBatch *spritebatch, unsigned int num);
+
+
+/**
+ *
+ * @param spritebatch
+ * @param rotation
+ */
+extern SBDECLSPEC int SBAPIENTRY sbEnableRotation(SBSpriteBatch* spritebatch, int rotation);
+
 
 /**
  * Begin spritebatch for adding sprite element for rendering.

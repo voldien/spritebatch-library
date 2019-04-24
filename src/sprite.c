@@ -78,17 +78,7 @@ SBSpriteBatch *sbCreateSpriteBatch(SBSpriteBatch *spritebatch) {
 
 	spbGLBindVertexArray(0);
 
-	/*	Load sprite shader.	*/
-	if (!sbCreateShaderv(&spritebatch->spriteShader, gc_shader_spriteV,
-	                     gc_shader_spriteF, NULL)) {
-		/*	failure	*/
-		sbReleaseSpriteBatch(spritebatch);
-		return NULL;
-	}
-	/*  Load sprite label shader.   */
-	if (!sbCreateShaderv(&spritebatch->fontShader, gc_shader_labelV,
-	                     gc_shader_labelF, NULL)) {
-		/*	failure	*/
+	if(!sbEnableRotation(spritebatch, 0)){
 		sbReleaseSpriteBatch(spritebatch);
 		return NULL;
 	}
@@ -189,12 +179,88 @@ void sbSpriteBatchAllocateSprite(SBSpriteBatch *spritebatch, unsigned int num) {
 	}
 
 	/*	Allocate local sprite buffer.	*/
-	spritebatch->sprite = realloc(spritebatch->sprite, num * sizeof(SBSprite));
+	//spritebatch->sprite = realloc(spritebatch->sprite, num * sizeof(SBSprite));
 	spritebatch->num = num;
 	/*  Allocate sprite buffer on the graphic device.   */
 	sbSetBufferSize(GL_ARRAY_BUFFER_ARB, spritebatch->vbo,
 	                spritebatch->num * sizeof(SBSprite), GL_DYNAMIC_DRAW);
 	spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+
+
+//	const uint32_t vertex_offset = 0;
+//	const uint32_t angle_offset = 12;
+//	const uint32_t rect_offset = 12 + 4;
+//	const uint32_t tex_offset = 12 + 20;
+//	const uint32_t scale_offset = 12 + 24;
+//	const uint32_t color_offset = 12 + 28;
+//
+//	/*  */
+//	spritebatch->nbuffers = 2;
+//	spritebatch->nthBuffer = 0;
+//	spritebatch->buffers = realloc(spritebatch->buffers, sizeof(*spritebatch->buffers) * spritebatch->nthBuffer);
+//	spritebatch->vaos = realloc(spritebatch->vaos, sizeof(*spritebatch->vaos) * spritebatch->nthBuffer);
+//	for(int i = 0; i < spritebatch->nbuffers; i++){
+//		sbGenVertexArrays(1, &spritebatch->vaos[i]);
+//		sbGenBuffers(1, &spritebatch->buffers[i]);
+//		sbSetBufferSize(GL_ARRAY_BUFFER_ARB, spritebatch->vbo,
+//		                spritebatch->num * sizeof(SBSprite), GL_DYNAMIC_DRAW);
+//		spbGLBindVertexArray(spritebatch->vao);
+//
+//		/*	TODO resolve.   */
+//		spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, spritebatch->vbo);
+//		spbGLEnableVertexAttribArrayARB(0);
+//		spbGLEnableVertexAttribArrayARB(1);
+//		spbGLEnableVertexAttribArrayARB(2);
+//		spbGLEnableVertexAttribArrayARB(3);
+//		spbGLEnableVertexAttribArrayARB(4);
+//		spbGLEnableVertexAttribArrayARB(5);
+//		spbGLVertexAttribPointerARB(0, 3, GL_FLOAT, GL_FALSE, sizeof(SBSprite),
+//		                            (const void *) vertex_offset);
+//		spbGLVertexAttribPointerARB(1, 1, GL_FLOAT, GL_FALSE, sizeof(SBSprite),
+//		                            (const void *) angle_offset);
+//		spbGLVertexAttribPointerARB(2, 4, GL_FLOAT, GL_FALSE, sizeof(SBSprite),
+//		                            (const void *) rect_offset);
+//		spbGLVertexAttribPointerARB(3, 1, GL_INT, GL_FALSE, sizeof(SBSprite),
+//		                            (const void *) tex_offset);
+//		spbGLVertexAttribPointerARB(4, 1, GL_FLOAT, GL_FALSE, sizeof(SBSprite),
+//		                            (const void *) scale_offset);
+//		spbGLVertexAttribPointerARB(5, 4, GL_FLOAT, GL_FALSE, sizeof(SBSprite),
+//		                            (const void *) color_offset);
+//
+//		spbGLBindVertexArray(0);
+//	}
+}
+
+int sbEnableRotation(SBSpriteBatch *spritebatch, int rotation) {
+	if (!rotation) {
+		/*	Load sprite shader.	*/
+		if (!sbCreateShaderv(&spritebatch->spriteShader, gc_shader_spriteV,
+		                     gc_shader_spriteF, NULL)) {
+			/*	failure	*/
+			return 0;
+		}
+		/*  Load sprite label shader.   */
+		if (!sbCreateShaderv(&spritebatch->fontShader, gc_shader_labelV,
+		                     gc_shader_labelF, NULL)) {
+			/*	failure	*/
+			return 0;
+		}
+
+	} else {
+		/*	Load sprite shader.	*/
+		if (!sbCreateShaderv(&spritebatch->spriteShader, gc_shader_spriteV,
+		                     gc_shader_spriteF, gc_shader_spriteG)) {
+			/*	failure	*/
+			return 0;
+		}
+		/*  Load sprite label shader.   */
+		if (!sbCreateShaderv(&spritebatch->fontShader, gc_shader_labelV,
+		                     gc_shader_labelF, gc_shader_labelG)) {
+			/*	failure	*/
+			return 0;
+		}
+	}
+	return 1;
 }
 
 void sbBeginSpriteBatch(SBSpriteBatch *SB_RESTRICT spriteBatch,
