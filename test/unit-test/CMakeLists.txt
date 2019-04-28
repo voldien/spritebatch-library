@@ -35,3 +35,6 @@ FILE(GLOB unitsrc  ${CMAKE_CURRENT_SOURCE_DIR}/*.c
 # Executable hpm assert program.
 ADD_EXECUTABLE(sprite-batch-cunit ${unitsrc})
 TARGET_LINK_LIBRARIES(sprite-batch-cunit -lm -lcheck -lpthread -lrt -lsubunit spb -lSDL2 sprite-batch-test-common)
+
+ADD_EXECUTABLE(sprite-batch-cunit-quad ${unitsrc})
+TARGET_LINK_LIBRARIES(sprite-batch-cunit-quad -lm -lcheck -lpthread -lrt -lsubunit spb-quad -lSDL2 sprite-batch-test-common)

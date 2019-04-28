@@ -22,9 +22,9 @@
 #include<check.h>
 #include<stdlib.h>
 
-void createSpriteBatch(SBSpriteBatch* spriteBatch, SBFont* font, SDL_Window** window){
+void createSpriteBatch(SBSpriteBatch *spriteBatch, SBFont *font, SDL_Window **window) {
 
-	SBSpriteBatch* sbSpriteBatch;
+	SBSpriteBatch *sbSpriteBatch;
 	int width, height;
 
 	init();
@@ -71,7 +71,7 @@ START_TEST(create){
 
 	SBSpriteBatch spriteBatch;
 	SBFont font;
-	SDL_Window* window;
+	SDL_Window *window;
 
 	createSpriteBatch(&spriteBatch, &font, &window);
 	ck_assert(sbDeleteFont(&font));
@@ -97,11 +97,21 @@ START_TEST(simulation){
 	ck_assert_int_eq(spriteBatch.numlabelDraw, 0);
 
 	sbDrawSprite(&spriteBatch, &texture, pos, NULL, NULL, 1.0f, 0.0f, 1.0f);
+	/*  Check sprite state. */
+	ck_assert_int_eq(spriteBatch.sprite[0].angle, 0.0f);
+
+	/*  Check spritebatch state.    */
 	ck_assert_int_eq(spriteBatch.numDraw, 1);
-	ck_assert_int_eq(spriteBatch.numTexture, 0);
+	ck_assert_int_eq(spriteBatch.numTexture, 1);
 	ck_assert_int_eq(spriteBatch.numlabelDraw, 0);
 
+
 	sbDrawSpriteLabel(&spriteBatch, "hello", &font, pos, NULL, NULL, 1.0f, 0.0f, 1.0f );
+
+	/*  Check spritebatch state.    */
+	ck_assert_int_eq(spriteBatch.numDraw, 1);
+	ck_assert_int_eq(spriteBatch.numTexture, 0);
+	ck_assert_int_eq(spriteBatch.numlabelDraw, 1);
 
 	sbEndSpriteBatch(&spriteBatch);
 	ck_assert_int_eq(spriteBatch.numDraw, 0);
