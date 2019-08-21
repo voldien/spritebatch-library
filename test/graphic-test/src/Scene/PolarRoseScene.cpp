@@ -17,7 +17,7 @@ void PolarRoseScene::init(void) {
 	const float rgba[] = {1.0f, 1.0f, 1.0f, 1.0f};
 	ProcedureTexture::createCircleTexture(512,512, rgba, &texture);
 
-	assert(sbCreateTexture(&texture, GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, pixel));
+	sbCreateTexture(&texture, GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, pixel);
 
 	//sbSpriteBatchAllocateSprite(this->getSpriteBatch(), 10000);
 

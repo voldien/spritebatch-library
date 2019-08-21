@@ -10,8 +10,7 @@ float TestScene::getTotalElapseTime(void) {
 void TestScene::init(void) {
 	uint8_t pixel[4] = {0xFF, 0xFF, 0xFF, 0xFF};
 
-	assert(sbCreateTexture(&this->texture, GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, pixel));
-
+	sbCreateTexture(&this->texture, GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, pixel);
 	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
 }
 
