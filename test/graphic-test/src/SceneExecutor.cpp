@@ -43,7 +43,8 @@ void SceneExecutor::run(void) {
 	/*	Time.	*/
 	long int pretime = SDL_GetPerformanceCounter();
 	long int startTime = SDL_GetPerformanceCounter();
-
+	printf("==Start==\n");
+	printf("time deltaTime primitives-generated samples\n");
 	/*	Continue program in till it dies.	*/
 	while (alive) {
 		BenchmarkScene *scene = this->scene;
@@ -100,7 +101,7 @@ void SceneExecutor::run(void) {
 		glGetQueryObjectiv(this->queries[1], GL_QUERY_RESULT, &nrPrimitives);
 
 		/*  Present the value */
-		printf("time: %f;deltaTime: %f; primitives-generated: %d; samples: %d\n", elapseTime, deltaTimef, nrPrimitives,
+		printf("%f  %f %d %d\n", elapseTime, deltaTimef, nrPrimitives,
 		       nrSamples);
 
 		/*  */
@@ -109,8 +110,8 @@ void SceneExecutor::run(void) {
 		this->primitiveCounter += nrPrimitives;
 		this->sampleCounter += nrSamples;
 	}
-	printf("Total Frame Count: %d; Total Primitive Count: %d; Total Sample Count: %d; Elapsed Time: %f; Scene: %s\n\n",
+	printf("!-->Total Frame Count: %d; Total Primitive Count: %d; Total Sample Count: %d; Elapsed Time: %f; Scene: %s\n\n",
 	       this->frameCounter, this->primitiveCounter, this->sampleCounter, this->scene->getTotalElapseTime(),
 	       this->scene->getName());
+	printf("==End==\n");
 }
-

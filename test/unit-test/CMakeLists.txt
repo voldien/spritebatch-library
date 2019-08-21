@@ -28,13 +28,17 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/../../include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../common-test)
 
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/Modules/FindCheck.cmake)
+INCLUDE_DIRECTORIES(${CHECK_INCLUDE_DIR})
+MESSAGE(STATUS "${CHECK_LIBRARIES}")
+
 # Source files for the hpmassert program.
 FILE(GLOB unitsrc  ${CMAKE_CURRENT_SOURCE_DIR}/*.c
         ${CMAKE_CURRENT_SOURCE_DIR}/../*.c)
 
 # Executable hpm assert program.
 ADD_EXECUTABLE(sprite-batch-cunit ${unitsrc})
-TARGET_LINK_LIBRARIES(sprite-batch-cunit -lm -lcheck -lpthread -lrt -lsubunit spb -lSDL2 sprite-batch-test-common)
+TARGET_LINK_LIBRARIES(sprite-batch-cunit ${CHECK_LIBRARIES} -lm pthread -lrt  spb -lSDL2 sprite-batch-test-common)
 
 ADD_EXECUTABLE(sprite-batch-cunit-quad ${unitsrc})
-TARGET_LINK_LIBRARIES(sprite-batch-cunit-quad -lm -lcheck -lpthread -lrt -lsubunit spb-quad -lSDL2 sprite-batch-test-common)
+TARGET_LINK_LIBRARIES(sprite-batch-cunit-quad -lm ${CHECK_LIBRARIES} pthread -lrt  spb-quad -lSDL2 sprite-batch-test-common)

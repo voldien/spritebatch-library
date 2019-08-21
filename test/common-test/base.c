@@ -24,16 +24,16 @@ SDL_Window *createWindow(void) {
 	                          SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 	                          mode.w / 2, mode.h / 2,
 	                          SDL_WINDOW_OPENGL | /*	SDL_WINDOW_BORDERLESS |	*/
-	                          SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
+	                          SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
 	if (window == NULL) {
 		fprintf(stderr, "Failed to create SDL window, %s.\n", SDL_GetError());
 		return NULL;
 	}
-	SDL_ShowWindow(window);
+
 
 	/*	Enable debug in debug mode.	*/
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,
-	                    SDL_GL_CONTEXT_DEBUG_FLAG);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,
+	//                    0);
 
 	/*	Default framebuffer settings.	*/
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -69,9 +69,9 @@ SDL_Window *createWindow(void) {
 		return NULL;
 	}
 
-	printf("Vendor: %s\n", glGetString(GL_VENDOR));
-	printf("Renderer: %s\n", glGetString(GL_RENDERER));
-	printf("Version: %s\n", glGetString(GL_VERSION));
+	//printf("Vendor: %s\n", glGetString(GL_VENDOR));
+	//printf("Renderer: %s\n", glGetString(GL_RENDERER));
+	//printf("Version: %s\n", glGetString(GL_VERSION));
 
 	/*	Enable debug.	*/
 #if defined(_DEBUG)
@@ -87,14 +87,16 @@ SDL_Window *createWindow(void) {
 	glDisable(GL_STENCIL_TEST);
 	glDisable(GL_CULL_FACE);
 	glCullFace(GL_FRONT_AND_BACK);
+	glFrontFace(GL_CCW);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glEnable(GL_DITHER);
 
 	/*  Enable v-sync.  */
-	SDL_GL_SetSwapInterval(SDL_TRUE);
+	SDL_GL_SetSwapInterval(SDL_FALSE);
 
 
+	SDL_ShowWindow(window);
 	return window;
 }
 
@@ -104,7 +106,6 @@ void deleteWindow(SDL_Window *window) {
 	SDL_GL_DeleteContext(SDL_GL_GetCurrentContext());
 	SDL_DestroyWindow(window);
 }
-
 
 
 void windowTitle(SDL_Window *window, const char *format, ...) {
@@ -245,7 +246,7 @@ void callback_debug_gl(GLenum source, GLenum type, GLuint id, GLenum severity,
 }
 
 void spEnableDebug(void) {
-
+	return;
 	glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC) SDL_GL_GetProcAddress("glDebugMessageCallbackARB");
 	glDebugMessageCallbackAMD = (PFNGLDEBUGMESSAGECALLBACKAMDPROC) SDL_GL_GetProcAddress("glDebugMessageCallbackAMD");
 
