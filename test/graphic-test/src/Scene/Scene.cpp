@@ -6,7 +6,7 @@
 
 Scene::Scene(void) {
 	this->spriteBatch = new SBSpriteBatch();
-	assert(sbCreateSpriteBatch(this->spriteBatch));
+	sbCreateSpriteBatch(this->spriteBatch);
 }
 
 void *Scene::getData(void) {
