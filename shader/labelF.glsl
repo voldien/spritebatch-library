@@ -32,10 +32,10 @@ uniform sampler2D textures[64];
 
 
 void main(void){
-    const float distance = texture2D(textures[0], frect.zy).a;
+    float distance = texture2D(textures[0], frect.zy).a;
 
     float smoothing = 0.0f;
-    const float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, distance);
+    float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, distance);
 
     /**/
     fragColor = vec4(fcolor.rgb, fcolor.a * alpha);

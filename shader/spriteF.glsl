@@ -28,12 +28,17 @@ FLAT_IN int ftexture;
 SMOOTH_IN vec4 fcolor;
 
 /*  Sprite textures.    */
-uniform sampler2D textures[32];
+#ifdef gl_MaxTextureImageUnits
+uniform sampler2D textures[gl_MaxTextureImageUnits];
+#else
+uniform sampler2D textures[16];
+#endif 
 
 /**
  * Get texture by index.
  */
 ivec2 getTexture(const in int index) {
+
 #if __VERSION__ < 410
 	switch(index) {
 		case 0:
@@ -67,7 +72,9 @@ ivec2 getTexture(const in int index) {
 		case 14:
 		return textureSize(textures[14], 0);
 		case 15:
-		return textureSize(textures[15], 0);
+        return textureSize(textures[15], 0);
+#ifdef gl_MaxTextureImageUnits
+    #if gl_MaxTextureImageUnits > 16
 		case 16:
 		return textureSize(textures[16], 0);
 		case 17:
@@ -105,6 +112,8 @@ ivec2 getTexture(const in int index) {
 		return textureSize(textures[32], 0);
 		case 33:
 		return textureSize(textures[33], 0);*/
+    #endif
+#endif
 		default:
 		return textureSize(textures[0], 0);
 	}
@@ -148,6 +157,8 @@ vec4 gettextfrag(const in int index, const in vec2 uv){
 		    return texture(textures[14], uv);
 		case 15:
 		    return texture(textures[15], uv);
+#ifdef gl_MaxTextureImageUnits
+    #if gl_MaxTextureImageUnits > 16
 		case 16:
 		    return texture(textures[16], uv);
 		case 17:
@@ -184,6 +195,8 @@ vec4 gettextfrag(const in int index, const in vec2 uv){
 		    return texture(textures[32], uv);
 		case 33:
 		    return texture(textures[33], uv);*/
+    #endif
+#endif
 		default:
 		    return vec4(0.0);
 	}
@@ -200,8 +213,8 @@ void main(void){
 	/*  */
 	vec2 fragscale = vec2(clamp( texheight / texwidth, 1.0, 10.0 ) , clamp( texwidth / texheight, 1.0 ,10.0) );
 
-    const vec2 coord = frect.xy  + ((vec2(1.0) - frect.zw) / 2.0) * vec2(-1.0, 1.0)  + vec2(0.5) + coord * ((gl_PointCoord - vec2(0.5) ) * frect.zw * fragscale.xy);
+    vec2 coord = frect.xy  + ((vec2(1.0) - frect.zw) / 2.0) * vec2(-1.0, 1.0)  + vec2(0.5) + coord * ((gl_PointCoord - vec2(0.5) ) * frect.zw * fragscale.xy);
 
-	const vec4 finalColor = gettextfrag(ftexture, coord);// * fcolor;
+	vec4 finalColor = gettextfrag(ftexture, coord) * fcolor;
     fragColor = finalColor;
 }

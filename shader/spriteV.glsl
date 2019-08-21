@@ -29,11 +29,11 @@ ATTRIBUTE_IN(5) vec4 color;
 /*  */
 uniform mat3 gmat;
 uniform float gscale;
-#if defined(GL_ARB_bindless_texture)
-uniform sampler2D textures[32];
+#ifdef gl_MaxVertexTextureImageUnits
+uniform sampler2D textures[gl_MaxVertexTextureImageUnits];
 #else
-uniform sampler2D textures[32];
-#endif
+uniform sampler2D textures[16];
+#endif 
 
 /*  Compute varying attributes. */
 SMOOTH_OUT float fangle;
@@ -46,7 +46,7 @@ SMOOTH_OUT vec4 fcolor;
  * Get texture by index.
  */
 ivec2 getTexture(const in int index) {
-#if defined(GL_ARB_bindless_texture)
+#if __VERSION__ >= 410
 	return textureSize(textures[index], 0);
 #else
 	switch(index) {
@@ -82,6 +82,8 @@ ivec2 getTexture(const in int index) {
 		return textureSize(textures[14], 0);
 		case 15:
 		return textureSize(textures[15], 0);
+#ifdef gl_MaxTextureImageUnits
+    #if gl_MaxTextureImageUnits > 16
 		case 16:
 		return textureSize(textures[16], 0);
 		case 17:
@@ -112,13 +114,15 @@ ivec2 getTexture(const in int index) {
 		return textureSize(textures[29], 0);
 		case 30:
 		return textureSize(textures[30], 0);
-		/*
 		case 31:
 		return textureSize(textures[31], 0);
+		/*
 		case 32:
 		return textureSize(textures[32], 0);
 		case 33:
 		return textureSize(textures[33], 0);*/
+    #endif
+#endif
 		default:
 		return textureSize(textures[0], 0);
 	}
@@ -145,8 +149,10 @@ void main(void) {
 	        max(abs(uv.x * sin(angle)) + abs(uv.y * cos(angle)),
 	                abs(uv.x * cos(angle)) + abs(uv.y * sin(angle))));
 
-    /*  */
+    /*  Scale transformation.   */
 	gl_PointSize *= gscale;
+
+	/*  */
 	gl_Position = vec4((gmat * vec3(vertex.xy, 1.0)).xy, vertex.z, 1.0);
 
 	/*	*/
