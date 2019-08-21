@@ -103,6 +103,14 @@ extern SBDECLSPEC void* SBAPIENTRY sbMapBufferWOnly(unsigned int target, unsigne
  */
 extern SBDECLSPEC int SBAPIENTRY sbUnmapBuffer(unsigned int target);
 
+/**
+ *
+ * @param vao
+ * @param i
+ * @param numDraw
+ */
+extern SBDECLSPEC void SBAPIENTRY sbDrawArray(unsigned int vao, int i, unsigned int numDraw);
+
 
 #ifdef __cplusplus	/* C++ environment	*/
 }

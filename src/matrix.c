@@ -25,7 +25,7 @@ void sbMatrix3x3Scale(float f_mat2[3][3], float scale) {
 	f_mat2[2][2] = 1.0f;
 }
 
-void sbMatrix3x3Rotation(float f_mat3[3][3], float rotation){
+void sbMatrix3x3Rotation(float f_mat3[3][3], float rotation) {
 	f_mat3[0][0] = cosf(rotation);
 	f_mat3[1][0] = -sinf(rotation);
 	f_mat3[2][0] = 0.0f;

@@ -52,3 +52,10 @@ int sbUnmapBuffer(unsigned int target) {
 	assert(status == GL_TRUE);
 	return status;
 }
+
+
+void sbDrawArray(unsigned int vao, int start, unsigned int numDraw){
+	spbGLBindVertexArray(vao);
+	glDrawArrays(GL_POINTS, start, numDraw);
+	spbGLBindVertexArray(0);
+}

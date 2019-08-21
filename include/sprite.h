@@ -57,10 +57,14 @@ typedef struct sb_sprite_batch_t {
 	unsigned int num;           /*	Number of allocated sprites.    */
 	unsigned int numDraw;       /*	Number of sprite in batch.  */
 	unsigned int numlabelDraw;  /*	Number of label sprite in batch.    */
-	unsigned int vbo;           /*	Sprite buffer uid.  */
 	unsigned int vao;           /*	Vertex geometry object uid. */
-	void* pspritemap;           /*  TODO add support for DMA sprites.   */
-	void* plabelmap;            /*  TODO add support for DMA labels.    */
+
+    /*  Round buffer for sprites.   */
+	int nbuffers;               /*  Number of buffers.  */
+    int nthBuffer;              /*  Current bound buffer.   */
+	unsigned int buffers[3];    /*  Buffer array ID.    */
+	SBSprite* cspritemap;       /*  */
+	SBSprite* clabelmap;        /*  */
 
 	/*	*/
 	SBShader spriteShader;      /*	Sprite shader.  */
@@ -153,6 +157,20 @@ extern SBDECLSPEC void SBAPIENTRY sbBeginSpriteBatch(
  * @param spriteBatch valid spritebatch object.
  */
 extern SBDECLSPEC void SBAPIENTRY sbEndSpriteBatch(SBSpriteBatch* spriteBatch);
+
+/**
+ *
+ * @param spritebatch
+ * @param blend
+ */
+extern SBDECLSPEC void SBAPIENTRY sbBlend(SBSpriteBatch* spritebatch, int blend);
+
+/**
+ * 
+ * @param spritebatch
+ * @param equation
+ */
+extern SBDECLSPEC void SBAPIENTRY sbBlendEquate(SBSpriteBatch* spritebatch, int equation);
 
 /**
  * Draw sprite in pixel screen coordinate.

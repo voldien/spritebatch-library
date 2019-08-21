@@ -7,11 +7,13 @@
 #include<malloc.h>
 #include<assert.h>
 
+void sbDrawArray(unsigned int vao, int i, unsigned int draw);
+
 #ifdef GL_ES_VERSION_3_0
-	#include<GLES3/gl3.h>
+#include<GLES3/gl3.h>
 #elif defined(GL_ES_VERSION_2_0)
-	#undef GL_ES_VERSION_2_0
-	#include<GLES2/gl2.h>
+#undef GL_ES_VERSION_2_0
+#include<GLES2/gl2.h>
 #else
 #endif
 
@@ -47,17 +49,23 @@ SBSpriteBatch *sbCreateSpriteBatch(SBSpriteBatch *spritebatch) {
 	spritebatch->numTexture = 0;
 	assert(spritebatch->textures);
 
+	/*  Buffer allocation.  */
+	spritebatch->nthBuffer = 0;
+	spritebatch->nbuffers = sizeof(spritebatch->buffers) / sizeof(spritebatch->buffers[0]);
+	memset(spritebatch->buffers, 0, spritebatch->nbuffers * sizeof(spritebatch->buffers[0]));
+
 	/*	Sprites.    */
 	spritebatch->scale = 1.0f;
 	spritebatch->sprite = NULL;
 	sbSpriteBatchAllocateSprite(spritebatch, numSprites);
+
 
 	/*	Create vertex buffer.   */
 	sbGenVertexArrays(1, &spritebatch->vao);
 	spbGLBindVertexArray(spritebatch->vao);
 
 	/*	TODO resolve.   */
-	spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, spritebatch->vbo);
+	spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, spritebatch->buffers[0]);
 	spbGLEnableVertexAttribArrayARB(0);
 	spbGLEnableVertexAttribArrayARB(1);
 	spbGLEnableVertexAttribArrayARB(2);
@@ -79,7 +87,7 @@ SBSpriteBatch *sbCreateSpriteBatch(SBSpriteBatch *spritebatch) {
 
 	spbGLBindVertexArray(0);
 
-	if(!sbEnableRotation(spritebatch, 0)){
+	if (!sbEnableRotation(spritebatch, 0)) {
 		sbReleaseSpriteBatch(spritebatch);
 		return NULL;
 	}
@@ -100,28 +108,27 @@ SBSpriteBatch *sbCreateSpriteBatch(SBSpriteBatch *spritebatch) {
 	}
 
 	/*	Init shader.    */
-	spbGLUseProgram(spritebatch->spriteShader.program);
-	spbGLUniform1fvARB(spritebatch->uniform.locationScale, 1, &spritebatch->scale);
+	setShaderUniform1fv(&spritebatch->spriteShader, spritebatch->uniform.locationScale, 1, &spritebatch->scale);
 
 	/*	Set texture index mapping.	*/
 	for (x = 0; x < spritebatch->numMaxTextures; x++)
 		texture[x] = x;
 
 	/*  TODO fix constant size. */
-	spbGLUniform1ivARB(spritebatch->uniform.locationTexture, nrTextures,
-	                   (const GLint *) &texture[0]);
+	setShaderUniform1iv(&spritebatch->spriteShader, spritebatch->uniform.locationTexture, nrTextures,
+	                    (const GLint *) &texture[0]);
 
-	spbGLUseProgram(0);
+	sbBindShader(NULL);
 
 	/*	Enable hardware sprite feature. */
 #if !defined(GL_ES_VERSION_2_0)
+	/*	TODO resolve.   */
 	glEnable(GL_POINT_SPRITE_ARB);
 	glEnable(GL_PROGRAM_POINT_SIZE_ARB);
 	spbGLPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
 	spbGLPointParameterf(GL_POINT_SIZE_MIN, 1.0f);
 	glGetFloatv(GL_POINT_SIZE_MAX, &mpointsize);
 	spbGLPointParameterf(GL_POINT_SIZE_MAX, mpointsize);
-	//spbGLPointParameterf(GL_POINT_FADE_THRESHOLD_SIZE_ARB, 60.0f);
 	spbGLPointParameterf(GL_POINT_FADE_THRESHOLD_SIZE, 1.0f);
 	//GL_POINT_DISTANCE_ATTENUATION_ARB
 #endif
@@ -133,12 +140,24 @@ SBSpriteBatch *sbCreateSpriteBatch(SBSpriteBatch *spritebatch) {
 	return spritebatch;
 }
 
+static void enablePointSprite(void) {
+	GLfloat mpointsize;
+	glEnable(GL_POINT_SPRITE_ARB);
+	glEnable(GL_PROGRAM_POINT_SIZE_ARB);
+	spbGLPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
+	spbGLPointParameterf(GL_POINT_SIZE_MIN, 1.0f);
+	glGetFloatv(GL_POINT_SIZE_MAX, &mpointsize);
+	spbGLPointParameterf(GL_POINT_SIZE_MAX, mpointsize);
+	spbGLPointParameterf(GL_POINT_FADE_THRESHOLD_SIZE, 1.0f);
+	//GL_POINT_DISTANCE_ATTENUATION_ARB
+}
+
 int sbReleaseSpriteBatch(SBSpriteBatch *spritebatch) {
 	int status;
 
 	/*  Delete buffers. */
-	if (spbGLIsBufferARB(spritebatch->vbo) == GL_TRUE)
-		sbDestroyBuffer(spritebatch->vbo);
+//	if (spbGLIsBufferARB(spritebatch->vbo) == GL_TRUE)
+//		sbDestroyBuffer(spritebatch->vbo);
 	if (spGLIsVertexArray(spritebatch->vao) == GL_TRUE)
 		spGLDeleteVertexArrays(1, &spritebatch->vao);
 
@@ -157,7 +176,7 @@ int sbReleaseSpriteBatch(SBSpriteBatch *spritebatch) {
 	spritebatch->textures = NULL;
 
 	/*	Clear memory.	*/
-	status = !spbGLIsBufferARB(spritebatch->vbo);
+//	status = !spbGLIsBufferARB(spritebatch->vbo);
 	memset(spritebatch, 0, sizeof(*spritebatch));
 	return status;
 }
@@ -169,25 +188,28 @@ void sbSpriteBatchAllocateSprite(SBSpriteBatch *spritebatch, unsigned int num) {
 		return;
 
 	/*	Flush current buffer if exists and is not in the middle of drawing.	*//*    TODO add better logic */
-	if (spbGLIsBufferARB(spritebatch->vbo) && spritebatch->sprite && spritebatch->numDraw)
+	if (spbGLIsBufferARB(spritebatch->buffers[spritebatch->nthBuffer]) && spritebatch->sprite && spritebatch->numDraw)
 		sbFlushSpriteBatch(spritebatch);
 
-	/*	Check if buffer has been created.	*/
-	if (spbGLIsBufferARB(spritebatch->vbo) == 0) {
-		/*  Create vertex buffer.   */
-		spbGLBindVertexArray(spritebatch->vao);
-		sbGenBuffers(1, &spritebatch->vbo);
-		spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, spritebatch->vbo);
-	}
 
 	/*	Allocate local sprite buffer.	*/
 	//spritebatch->sprite = realloc(spritebatch->sprite, num * sizeof(SBSprite));
 	spritebatch->num = num;
 	/*  Allocate sprite buffer on the graphic device.   */
-	sbSetBufferSize(GL_ARRAY_BUFFER_ARB, spritebatch->vbo,
-	                spritebatch->num * sizeof(SBSprite), GL_DYNAMIC_DRAW);
-	spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+	for(int i = 0; i < spritebatch->nbuffers; i++){
+		/*	Check if buffer has been created.	*/
+		if (spbGLIsBufferARB(spritebatch->buffers[i]) == 0) {
+			/*  Create vertex buffer.   */
+			sbGenBuffers(1, &spritebatch->buffers[i]);
+		}
 
+		spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, spritebatch->buffers[i]);
+		sbSetBufferSize(GL_ARRAY_BUFFER_ARB, spritebatch->buffers[i],
+		                spritebatch->num * sizeof(SBSprite), GL_DYNAMIC_DRAW);
+		spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+	}
+
+	spritebatch->nthBuffer = 0;
 
 //	const uint32_t vertex_offset = 0;
 //	const uint32_t angle_offset = 12;
@@ -276,9 +298,10 @@ void sbBeginSpriteBatch(SBSpriteBatch *SB_RESTRICT spriteBatch,
 	spriteBatch->numlabelDraw = 0;
 
 	/*	Get current size of the viewport.	*/
+	/*	TODO resolve.   */
 	glGetIntegerv(GL_VIEWPORT, rect);
-	spriteBatch->width = (unsigned int)(rect[2] - rect[0]);
-	spriteBatch->height = (unsigned int)(rect[3] - rect[1]);
+	spriteBatch->width = (unsigned int) (rect[2] - rect[0]);
+	spriteBatch->height = (unsigned int) (rect[3] - rect[1]);
 	spriteBatch->scale = scale;
 	spriteBatch->rotation = rotation;
 
@@ -296,8 +319,15 @@ void sbBeginSpriteBatch(SBSpriteBatch *SB_RESTRICT spriteBatch,
 	memset(spriteBatch->textures, 0, size);
 	spriteBatch->numTexture = 0;
 
+	/*  Update round robin buffer index.    */
+	spriteBatch->nthBuffer++;
+	spriteBatch->nthBuffer %= spriteBatch->nbuffers;
+
 	/*  Fetch buffer.   */
-	spriteBatch->sprite = (SBSprite*)sbMapBufferWOnly(GL_ARRAY_BUFFER_ARB, spriteBatch->vbo);
+	assert(spriteBatch->nthBuffer >= 0 && spriteBatch->nthBuffer < spriteBatch->nbuffers);
+	spriteBatch->sprite = (SBSprite *) sbMapBufferWOnly(GL_ARRAY_BUFFER_ARB, spriteBatch->buffers[spriteBatch->nthBuffer]);
+	spbGLBindVertexArray(spriteBatch->vao);
+	spGLBindVertexBuffer(0, spriteBatch->buffers[spriteBatch->nthBuffer], 0, sizeof(SBSprite));
 }
 
 void sbEndSpriteBatch(SBSpriteBatch *spriteBatch) {
@@ -410,7 +440,7 @@ int sbAddSpriteNormalized(SBSpriteBatch *spritebatch, SBTexture *texture,
 
 	int texIndex;
 	const unsigned int numDraw = spritebatch->numDraw;
-	SBSprite * SB_RESTRICT sprite = &spritebatch->sprite[numDraw];
+	SBSprite *SB_RESTRICT sprite = &spritebatch->sprite[numDraw];
 
 	if (spritebatch->numDraw == spritebatch->num)
 		return 0;
@@ -539,16 +569,14 @@ void sbDisplaySprite(SBSpriteBatch *spriteBatch) {
 
 	/*	Update uniform variables.   */
 	setShaderUniform1fv(&spriteBatch->spriteShader, spriteBatch->uniform.locationScale, 1, &spriteBatch->scale);
-	setShaderUniformMatrix3x3fv(&spriteBatch->spriteShader, spriteBatch->uniform.locationViewMatrix, 1, &spriteBatch->viewmatrix[0][0]);
+	setShaderUniformMatrix3x3fv(&spriteBatch->spriteShader, spriteBatch->uniform.locationViewMatrix, 1,
+	                            &spriteBatch->viewmatrix[0][0]);
 
 	/*	Draw sprites.	*/
-	spbGLBindVertexArray(spriteBatch->vao);
-	glDrawArrays(GL_POINTS, 0, spriteBatch->numDraw);
+	sbDrawArray(spriteBatch->vao, 0, spriteBatch->numDraw);
 	/*	labels.	*/
-//	spbGLUseProgram(spriteBatch->fontShader.program);
-//	glDrawArrays(GL_POINTS, (spriteBatch->num -spriteBatch->numlabelDraw) , spriteBatch->numlabelDraw);
-	spbGLBindVertexArray(0);
-
+	//sbBindShader(&spriteBatch->fontShader);
+	//sbDrawArray(spriteBatch->vao, (spriteBatch->num -spriteBatch->numlabelDraw) , spriteBatch->numlabelDraw);
 
 	sbEnablePointSprite(0);
 }

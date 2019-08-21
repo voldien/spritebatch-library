@@ -17,27 +17,55 @@
 
 #endif
 
-unsigned int sbGetGLSLVersion(void) {
+const char* sbGetGLSLVersion(void) {
 
 	unsigned int version;
 	char glstring[128] = {0};
 	char *wspac;
+	int major, minor;
+	glGetIntegerv(GL_MAJOR_VERSION, &major);
+	glGetIntegerv(GL_MINOR_VERSION, &minor);
 
-	/*	Extract version number.	*/
-	strcpy(glstring, (const char *) glGetString(GL_SHADING_LANGUAGE_VERSION));
-	wspac = strstr(glstring, " ");
-	if (wspac) {
-		*wspac = '\0';
+	/*  Lookup table.   */
+	int glVersion = major * 100 + minor * 10;
+	switch(glVersion){
+		case 200:return "110";
+		case 210:return "120";
+		case 300:return "130";
+		case 310:return "140";
+		case 320:return "150";
+		case 330:return "330";
+		case 400:return "400";
+		case 410:return "410";
+		case 420:return "420";
+		case 430:return "430";
+		case 440:return "440";
+		case 450:return "450";
+		case 460:return "460";
+			// Add the rest of the mapping as each new version is released.
+		default:
+			break;
 	}
-	if (strstr(glstring, ".") != NULL) {
-		unsigned int major = (unsigned int) (glstring[0] - '0') * 100;
-		unsigned int minor = (unsigned int) (glstring[2] - '0') * 10;
-
-		return major + minor;
-	} else {
-		version = (unsigned int) strtof(glstring, NULL) * 100;
-		return version;
-	}
+	//TODO add core and compatibility on the name.
+//	profile = glcore->useCoreProfile;
+//	strcore = profile ? "core" : "";
+//
+//
+//	/*	Extract version number.	*/
+//	strcpy(glstring, (const char *) glGetString(GL_SHADING_LANGUAGE_VERSION));
+//	wspac = strstr(glstring, " ");
+//	if (wspac) {
+//		*wspac = '\0';
+//	}
+//	if (strstr(glstring, ".") != NULL) {
+//		unsigned int major = (unsigned int) (glstring[0] - '0') * 100;
+//		unsigned int minor = (unsigned int) (glstring[2] - '0') * 10;
+//
+//		return major + minor;
+//	} else {
+//		version = (unsigned int) strtof(glstring, NULL) * 100;
+//		return version;
+//	}
 }
 
 SBShader prevshader = {0};
@@ -190,14 +218,12 @@ int sbCompileShaderSourcev(const char* source, unsigned int flag){
 
 	/*	Create version string.	*/
 	memset(glversion, 0, sizeof(glversion));
-	sprintf(glversion, "#version %d %s\n", sbGetGLSLVersion(), strcore);
+	sprintf(glversion, "#version %s %s\n", sbGetGLSLVersion(), strcore);
 
 	/*	*/
 	sources[0] = glversion;
 	sources[1] = gc_shader_def;
 	sources[2] = source;
-
-	printf(glversion);
 
 	/*	Compile*/
 	shader = spbGLCreateShader(flag);

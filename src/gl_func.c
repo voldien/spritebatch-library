@@ -57,6 +57,7 @@ PFNGLGENVERTEXARRAYSPROC spbGLGenVertexArrays;
 PFNGLBINDVERTEXARRAYPROC spbGLBindVertexArray;
 PFNGLISVERTEXARRAYPROC spGLIsVertexArray;
 PFNGLDELETEVERTEXARRAYSPROC spGLDeleteVertexArrays;
+PFNGLBINDVERTEXBUFFERPROC spGLBindVertexBuffer;
 
 PFNGLBINDBUFFERARBPROC spbGLBindBufferARB;
 PFNGLBUFFERDATAARBPROC spbGLBufferDataARB;
@@ -125,6 +126,7 @@ int sb_internal_load_gl_func(void){
 	spbGLBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)load_gl_func("glBindVertexArray");
 	spGLIsVertexArray = (PFNGLISVERTEXARRAYPROC)load_gl_func("glIsVertexArray");
 	spGLDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)load_gl_func("glDeleteVertexArrays");
+	spGLBindVertexBuffer = (PFNGLBINDVERTEXBUFFERPROC) load_gl_func("glBindVertexBuffer");
 
 	/*  Load buffer functions.  */
 	spbGLBindBufferARB = (PFNGLBINDBUFFERARBPROC)load_gl_func("glBindBufferARB");
