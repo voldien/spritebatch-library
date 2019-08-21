@@ -46,12 +46,30 @@ INCLUDE_DIRECTORIES(${FREETYPE_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
-FILE(GLOB src ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
+FILE(GLOB src   ${CMAKE_CURRENT_SOURCE_DIR}/src/font.c
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/geometry.c
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/gl_func.c
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/matrix.c
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/shader.c
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders.c
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/sprite.c
+                ${CMAKE_CURRENT_SOURCE_DIR}/src/texture.c)
+FILE(GLOB quad-src   ${CMAKE_CURRENT_SOURCE_DIR}/src/font.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/geometry.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gl_func.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/matrix.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/shader.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/sprite_quad.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/texture.c)
 FILE(GLOB headers ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 
 # Create executable target.
 ADD_LIBRARY(spb ${src})
 TARGET_LINK_LIBRARIES(spb ${OPENGL_LIBRARIES} ${FREETYPE_LIBRARIES})
+
+ADD_LIBRARY(spb-quad ${quad-src})
+TARGET_LINK_LIBRARIES(spb-quad ${OPENGL_LIBRARIES} ${FREETYPE_LIBRARIES})
 
 # Install the target.
 INSTALL(TARGETS spb DESTINATION lib)
