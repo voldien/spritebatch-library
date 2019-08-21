@@ -173,25 +173,6 @@ void sbSpriteBatchAllocateSprite(SBSpriteBatch *spritebatch, unsigned int num) {
 	/*	Flush current buffer if exists and is not in the middle of drawing.	*//*    TODO add better logic */
 	if (spbGLIsBufferARB(spritebatch->buffers[spritebatch->nthBuffer]) && spritebatch->sprite && spritebatch->numDraw)
 		sbFlushSpriteBatch(spritebatch);
-//
-//	/*	Check if buffer has been created.	*/
-//	if (spbGLIsBufferARB(spritebatch->vbo) == 0) {
-//		/*  Create vertex buffer.   */
-//		spbGLBindVertexArray(spritebatch->vao);
-//		sbGenBuffers(1, &spritebatch->vbo);
-//		spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, spritebatch->vbo);
-//	}
-//
-//	/*	Allocate local sprite buffer.	*/
-//	//spritebatch->sprite = realloc(spritebatch->sprite, num * sizeof(SBSprite));
-//	spritebatch->num = num;
-//	/*  Allocate sprite buffer on the graphic device.   */
-//	sbSetBufferSize(GL_ARRAY_BUFFER_ARB, spritebatch->vbo,
-//	                spritebatch->num * sizeof(SBQuadSprite), GL_DYNAMIC_DRAW_ARB);
-//	spbGLBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-//	spbGLBindVertexArray(0);
-
-
 
 	/*	Allocate local sprite buffer.	*/
 	//spritebatch->sprite = realloc(spritebatch->sprite, num * sizeof(SBSprite));
@@ -267,9 +248,8 @@ void sbBeginSpriteBatch(SBSpriteBatch *SB_RESTRICT spriteBatch,
 	memset(spriteBatch->textures, 0, size);
 	spriteBatch->numTexture = 0;
 
-	/*  Fetch buffer.   */
-	//spriteBatch->sprite = (SBSprite *) sbMapBufferWOnly(GL_ARRAY_BUFFER_ARB, spriteBatch->vbo);
 	/*  Update round robin buffer index.    */
+	assert(spriteBatch->nbuffers > 0);
 	spriteBatch->nthBuffer++;
 	spriteBatch->nthBuffer %= spriteBatch->nbuffers;
 

@@ -320,6 +320,7 @@ void sbBeginSpriteBatch(SBSpriteBatch *SB_RESTRICT spriteBatch,
 	spriteBatch->numTexture = 0;
 
 	/*  Update round robin buffer index.    */
+	assert(spriteBatch->nbuffers > 0);
 	spriteBatch->nthBuffer++;
 	spriteBatch->nthBuffer %= spriteBatch->nbuffers;
 
