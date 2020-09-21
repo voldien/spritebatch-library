@@ -2,8 +2,8 @@
 
 
 ## Motivation
-A library originally develop as part of the [https://github.com/voldien/ELT](ELT) project that was later branched into
-its own library. Where it would provide both rendering of sprites and font rendering.
+A library originally develop as part of the [ELT](https://github.com/voldien/ELT) project that was later branched into
+its own library. It would provide both rendering of sprites and font rendering. It was later created alongside a thesis project.
 
 ## Installation
 The software can be easily installed with invoking the following command.
